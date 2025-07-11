@@ -10,25 +10,72 @@ import { type AdapterAccount } from "next-auth/adapters";
  */
 export const createTable = pgTableCreator((name) => `nauka-ppla_${name}`);
 
-export const posts = createTable(
-  "post",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdById: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
+export const questions = createTable("question", (d) => ({
+  id: d
+    .varchar({ length: 255 })
+    .notNull()
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  externalId: d.varchar({ length: 255 }),
+  question: d.text().notNull(),
+  answerCorrect: d.text().notNull(),
+  answersIncorrect1: d.text().notNull(),
+  answersIncorrect2: d.text().notNull(),
+  answersIncorrect3: d.text().notNull(),
+  category: d.integer().references(() => categories.id),
+  createdBy: d.varchar({ length: 255 }).references(() => users.id),
+  createdAt: d
+    .timestamp({ withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`),
+}));
+
+export const questionsRelations = relations(questions, ({ many, one }) => ({
+  tags: many(questionsToTags),
+  category: one(categories, {
+    fields: [questions.category],
+    references: [categories.id],
   }),
-  (t) => [
-    index("created_by_idx").on(t.createdById),
-    index("name_idx").on(t.name),
-  ],
+}));
+
+export const categories = createTable("category", (d) => ({
+  id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: d.varchar({ length: 255 }).notNull(),
+  url: d.varchar({ length: 255 }).notNull().unique(),
+}));
+
+export const categoriesRelations = relations(categories, ({ many }) => ({
+  questions: many(questions),
+}));
+
+export const tags = createTable("tag", (d) => ({
+  id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+  name: d.varchar({ length: 255 }).notNull(),
+}));
+
+export const tagsRelations = relations(tags, ({ many }) => ({
+  questions: many(questionsToTags),
+}));
+
+export const questionsToTags = createTable("questions_to_tags", (d) => ({
+  questionId: d
+    .varchar({ length: 255 })
+    .notNull()
+    .references(() => questions.id),
+  tagId: d
+    .integer()
+    .notNull()
+    .references(() => tags.id),
+}));
+
+export const questionsToTagsRelations = relations(
+  questionsToTags,
+  ({ one }) => ({
+    question: one(questions, {
+      fields: [questionsToTags.questionId],
+      references: [questions.id],
+    }),
+    tag: one(tags, { fields: [questionsToTags.tagId], references: [tags.id] }),
+  }),
 );
 
 export const users = createTable("user", (d) => ({
