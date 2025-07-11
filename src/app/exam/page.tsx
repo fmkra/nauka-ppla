@@ -21,3 +21,5 @@ export default async function ExamPage() {
 
   return <ExamClientPage questions={questions} />;
 }
+
+export const dynamic = "force-dynamic";

@@ -47,3 +47,6 @@ export default async function QuestionBasePage() {
     </div>
   );
 }
+
+// TODO: remove this
+export const dynamic = "force-dynamic";

@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import type { QuestionParsed } from "./page";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
+import type { QuestionParsed } from "~/utils";
 
 export function Question({ question }: { question: QuestionParsed }) {
   const [selected, setSelected] = useState<number | null>(null);
