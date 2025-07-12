@@ -6,6 +6,15 @@ import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import type { QuestionParsed } from "~/utils";
 
+function getStyle(color: string | null) {
+  const colors = color?.split(",");
+  if (colors?.length != 2) return {};
+  return {
+    backgroundColor: colors[0],
+    borderColor: colors[1],
+  };
+}
+
 export function Question({ question }: { question: QuestionParsed }) {
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -49,7 +58,12 @@ export function Question({ question }: { question: QuestionParsed }) {
           </Button>
           <div className="flex items-start justify-between gap-2">
             {question.category && (
-              <Badge variant="secondary">{question.category.name}</Badge>
+              <Badge
+                variant="secondary"
+                style={getStyle(question.category.color)}
+              >
+                {question.category.name}
+              </Badge>
             )}
             {question.tags.map((tag) => (
               <Badge key={tag.tag.id}>{tag.tag.name}</Badge>

@@ -13,7 +13,7 @@ export interface QuestionBase {
   answersIncorrect1: string;
   answersIncorrect2: string;
   answersIncorrect3: string;
-  category: { name: string } | null;
+  category: { name: string; color: string | null } | null;
   tags: { tag: { id: number; name: string } }[];
 }
 

@@ -1,0 +1,1 @@
+ALTER TABLE "nauka-ppla_category" ADD COLUMN "color" varchar(15);
