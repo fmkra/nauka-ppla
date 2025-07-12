@@ -3,7 +3,7 @@
 import { Search } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
-import { Question } from "./question";
+import { Question } from "../_components/question";
 import { Spinner } from "~/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";

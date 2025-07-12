@@ -8,6 +8,7 @@ export const cn = (...inputs: ClassValue[]): string => {
 
 export interface QuestionBase {
   id: string;
+  externalId: string | null;
   question: string;
   answerCorrect: string;
   answersIncorrect1: string;

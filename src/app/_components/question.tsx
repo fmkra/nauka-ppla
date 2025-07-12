@@ -5,6 +5,13 @@ import { Badge } from "~/components/ui/badge";
 import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { randomizeQuestion, type QuestionBase } from "~/utils";
+import { Info } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "~/components/ui/tooltip";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -58,6 +65,9 @@ export function Question({ question: q }: { question: QuestionBase }) {
               : "Odznacz odpowiedź"}
           </Button>
           <div className="flex items-start justify-between gap-2">
+            {question.tags.map((tag) => (
+              <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
+            ))}
             {question.category && (
               <Badge
                 variant="secondary"
@@ -66,9 +76,18 @@ export function Question({ question: q }: { question: QuestionBase }) {
                 {question.category.name}
               </Badge>
             )}
-            {question.tags.map((tag) => (
-              <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
-            ))}
+            {question.externalId && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Info className="text-muted-foreground my-[3px] h-4 w-4 cursor-help" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{question.externalId}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
           </div>
         </div>
       </CardContent>
