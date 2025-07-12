@@ -28,6 +28,22 @@ interface CategoryFilterProps {
   onCategoriesChange: (categories: number[]) => void;
 }
 
+function conjugate(count: number, single: string, few: string, many: string) {
+  if (count === 1) return single;
+
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+
+  if (
+    lastDigit >= 2 &&
+    lastDigit <= 4 &&
+    !(lastTwoDigits >= 12 && lastTwoDigits <= 14)
+  )
+    return few;
+
+  return many;
+}
+
 export function CategoryFilter({
   selectedCategories,
   onCategoriesChange,
@@ -61,11 +77,11 @@ export function CategoryFilter({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" className="justify-between">
           <span>
-            {selectedCount === 0
+            {selectedCount == 0 || selectedCount == totalCount
               ? "Wszystkie kategorie"
-              : selectedCount === totalCount
-                ? "Wszystkie kategorie"
-                : `${selectedCount} kategorii`}
+              : selectedCount +
+                " " +
+                conjugate(selectedCount, "kategoria", "kategorie", "kategorii")}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>

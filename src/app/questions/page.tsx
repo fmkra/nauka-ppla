@@ -33,10 +33,10 @@ export default function QuestionsPage() {
 
   const pagination = usePagination(pageSizeOptions, "20", totalCount);
 
-  useEffect(
-    () => pagination.setCurrentPage(1),
-    [pagination, searchDebounced, selectedCategories],
-  );
+  const setCurrentPage = pagination.setCurrentPage;
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [setCurrentPage, searchDebounced, selectedCategories]);
 
   const { data: questions, isLoading: questionsLoading } =
     api.question.getQuestions.useQuery({
