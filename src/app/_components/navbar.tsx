@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "~/utils";
-import { BookOpen, Database, GraduationCap, Home } from "lucide-react";
+import { BookOpen, Database, GraduationCap, Home, User } from "lucide-react";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { Button } from "~/components/ui/button";
+import { Spinner } from "~/components/ui/spinner";
 
 const navigation = [
   { name: "Start", href: "/", icon: Home },
@@ -14,6 +17,7 @@ const navigation = [
 
 export default function Navbar() {
   const pathname = usePathname();
+  const session = useSession();
 
   return (
     <nav className="bg-background/95 supports-[backdrop-filter]:bg-background/60 border-b backdrop-blur">
@@ -44,6 +48,20 @@ export default function Navbar() {
               );
             })}
           </div>
+
+          {session.status === "loading" ? (
+            <div className="flex w-28 items-center justify-center space-x-2">
+              <Spinner className="h-4 w-4" />
+            </div>
+          ) : session.data?.user ? (
+            <div className="flex items-center space-x-2">
+              <User className="h-4 w-4" />
+              <span>{session.data?.user.name}</span>
+              <Button onClick={() => signOut()}>Wyloguj się</Button>
+            </div>
+          ) : (
+            <Button onClick={() => signIn("google")}>Zaloguj się</Button>
+          )}
         </div>
       </div>
     </nav>

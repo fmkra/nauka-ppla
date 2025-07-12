@@ -6,6 +6,7 @@ import { Geist } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 
 import Navbar from "~/app/_components/navbar";
+import { SessionProvider } from "next-auth/react";
 
 // export const metadata: Metadata = {
 //   title: "Create T3 App",
@@ -24,10 +25,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${geist.variable}`}>
       <body>
-        <TRPCReactProvider>
-          <Navbar />
-          <main className="container mx-auto p-4">{children}</main>
-        </TRPCReactProvider>
+        <SessionProvider>
+          <TRPCReactProvider>
+            <Navbar />
+            <main className="container mx-auto p-4">{children}</main>
+          </TRPCReactProvider>
+        </SessionProvider>
       </body>
     </html>
   );
