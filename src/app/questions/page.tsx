@@ -1,9 +1,7 @@
 "use client";
 
 import { Search } from "lucide-react";
-import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Filter } from "lucide-react";
 import { api } from "~/trpc/react";
 import { Question } from "./question";
 import { Spinner } from "~/components/ui/spinner";
@@ -11,6 +9,7 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type SelectOption } from "~/components/ui/select";
 import usePagination from "../_components/pagination";
+import { CategoryFilter } from "./category-filter";
 
 const pageSizeOptions: SelectOption[] = [
   { value: "5", label: "5 pytań" },
@@ -22,20 +21,28 @@ const pageSizeOptions: SelectOption[] = [
 
 export default function QuestionsPage() {
   const [search, setSearch] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const searchDebounced = useDebounce(search, 500);
 
   const { data: totalCount, isLoading: countLoading } =
     api.question.getQuestionsCount.useQuery({
       search: searchDebounced,
+      categoryIds:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
     });
 
   const pagination = usePagination(pageSizeOptions, "20", totalCount);
 
-  useEffect(() => pagination.setCurrentPage(1), [pagination, searchDebounced]);
+  useEffect(
+    () => pagination.setCurrentPage(1),
+    [pagination, searchDebounced, selectedCategories],
+  );
 
   const { data: questions, isLoading: questionsLoading } =
     api.question.getQuestions.useQuery({
       search: searchDebounced,
+      categoryIds:
+        selectedCategories.length > 0 ? selectedCategories : undefined,
       limit: pagination.limit,
       offset: pagination.offset,
     });
@@ -62,10 +69,10 @@ export default function QuestionsPage() {
           />
         </div>
         <div className="w-32">{pagination.pageSizeSelector}</div>
-        <Button variant="outline">
-          <Filter className="mr-2 h-4 w-4" />
-          Filtry
-        </Button>
+        <CategoryFilter
+          selectedCategories={selectedCategories}
+          onCategoriesChange={setSelectedCategories}
+        />
       </div>
 
       {isLoading && (
