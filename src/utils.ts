@@ -33,8 +33,7 @@ export function parseQuestions<T extends QuestionBase>(
       question.answersIncorrect2,
       question.answersIncorrect3,
     ];
-    const permutation = [0, 1, 2, 3];
-    arrayShuffle(permutation);
+    const permutation = arrayShuffle([0, 1, 2, 3]);
     const shuffledAnswers = permutation.map(
       (index) => answers[index],
     ) as string[];
