@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -13,6 +13,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/trpc/react";
 import { Spinner } from "~/components/ui/spinner";
+import { conjugate } from "~/utils";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -26,22 +27,6 @@ function getStyle(color: string | null) {
 interface CategoryFilterProps {
   selectedCategories: number[];
   onCategoriesChange: (categories: number[]) => void;
-}
-
-function conjugate(count: number, single: string, few: string, many: string) {
-  if (count === 1) return single;
-
-  const lastDigit = count % 10;
-  const lastTwoDigits = count % 100;
-
-  if (
-    lastDigit >= 2 &&
-    lastDigit <= 4 &&
-    !(lastTwoDigits >= 12 && lastTwoDigits <= 14)
-  )
-    return few;
-
-  return many;
 }
 
 export function CategoryFilter({

@@ -33,7 +33,7 @@ export default function Navbar() {
                   href={item.href}
                   className={cn(
                     "flex items-center space-x-2 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                    pathname === item.href
+                    pathname.split("/")[1] === item.href.split("/")[1]
                       ? "bg-primary text-primary-foreground"
                       : "text-muted-foreground hover:text-foreground hover:bg-accent",
                   )}

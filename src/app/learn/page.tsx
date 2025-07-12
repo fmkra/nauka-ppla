@@ -9,12 +9,24 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import * as icons from "lucide-react";
 import { db } from "~/server/db";
-import { categories } from "~/server/db/schema";
+import { categories, questions } from "~/server/db/schema";
+import { count, eq } from "drizzle-orm";
+import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/utils";
+import Link from "next/link";
 
 export default async function LearnPage() {
-  const cards = await db.query.categories.findMany({
-    orderBy: [categories.id],
-  });
+  const cardsWithCounts = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      url: categories.url,
+      description: categories.description,
+      questionCount: count(questions.id),
+    })
+    .from(categories)
+    .leftJoin(questions, eq(categories.id, questions.category))
+    .groupBy(categories.id)
+    .orderBy(categories.id);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -27,11 +39,14 @@ export default async function LearnPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {cards.map((card) => {
-          const [description, icon, duration, length, ...topics] =
+        {cardsWithCounts.map((card) => {
+          const [description, icon, ...topics] =
             card.description?.split("\n") ?? [];
           if (!icon) return null;
           const Icon = icons[icon as keyof typeof icons] as React.ElementType;
+          const duration = formatTime(
+            card.questionCount * MINUTES_PER_QUESTION,
+          );
 
           return (
             <Card key={card.id} className="transition-shadow hover:shadow-lg">
@@ -59,7 +74,13 @@ export default async function LearnPage() {
                   </div>
                   <div className="flex items-center gap-1">
                     <icons.BookOpen className="h-4 w-4" />
-                    {length}
+                    {card.questionCount}{" "}
+                    {conjugate(
+                      card.questionCount,
+                      "pytanie",
+                      "pytania",
+                      "pytań",
+                    )}
                   </div>
                 </div>
 
@@ -74,7 +95,9 @@ export default async function LearnPage() {
                   </div>
                 </div>
 
-                <Button className="mt-auto w-full">Rozpocznij naukę</Button>
+                <Button className="mt-auto w-full" asChild>
+                  <Link href={`/learn/${card.url}`}>Rozpocznij naukę</Link>
+                </Button>
               </CardContent>
             </Card>
           );
