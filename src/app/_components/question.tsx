@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { useAnswerStore } from "~/stores";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -25,8 +26,12 @@ function getStyle(color: string | null) {
 export function Question({ question: q }: { question: QuestionBase }) {
   const question = useMemo(() => randomizeQuestion(q), [q]);
 
-  // It is NOT index of displayed items but index in database (before shuffling)
-  const [selected, setSelected] = useState<number | null>(null);
+  const { answers, setAnswer } = useAnswerStore();
+  // `selected` is NOT index of displayed items but index in database (before shuffling)
+  const selected = answers[question.id] ?? null;
+  const setSelected = (index: number | null) => {
+    setAnswer(question.id, index);
+  };
 
   return (
     <Card key={question.id} className="transition-shadow hover:shadow-lg">
