@@ -42,6 +42,7 @@ export const categories = createTable("category", (d) => ({
   name: d.varchar({ length: 255 }).notNull(),
   url: d.varchar({ length: 255 }).notNull().unique(),
   color: d.varchar({ length: 15 }),
+  description: d.text(),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({

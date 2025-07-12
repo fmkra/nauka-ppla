@@ -1,0 +1,1 @@
+ALTER TABLE "nauka-ppla_category" ADD COLUMN "description" text;
