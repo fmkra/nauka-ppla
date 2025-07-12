@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Button } from "~/components/ui/button";
 import { randomizeQuestion, type QuestionBase } from "~/utils";
 import { Info } from "lucide-react";
@@ -26,12 +26,9 @@ function getStyle(color: string | null) {
 export function Question({ question: q }: { question: QuestionBase }) {
   const question = useMemo(() => randomizeQuestion(q), [q]);
 
-  const { answers, setAnswer } = useAnswerStore();
+  const { answerState } = useAnswerStore();
   // `selected` is NOT index of displayed items but index in database (before shuffling)
-  const selected = answers[question.id] ?? null;
-  const setSelected = (index: number | null) => {
-    setAnswer(question.id, index);
-  };
+  const [selected, setSelected] = answerState(question.id);
 
   return (
     <Card key={question.id} className="transition-shadow hover:shadow-lg">

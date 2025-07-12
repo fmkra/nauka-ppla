@@ -5,7 +5,9 @@ interface AnswerStore {
   answers: Record<string, number | undefined>;
 
   // Actions
-  setAnswer: (questionId: string, answer: number | null) => void;
+  answerState: (
+    questionId: string,
+  ) => [number | null, (answer: number | null) => void];
 }
 
 export const useAnswerStore = create<AnswerStore>()(
@@ -15,10 +17,17 @@ export const useAnswerStore = create<AnswerStore>()(
       answers: {},
 
       // Actions
-      setAnswer: (questionId, answer) =>
-        set((state) => ({
-          answers: { ...state.answers, [questionId]: answer ?? undefined },
-        })),
+      answerState: (questionId) => {
+        const answers = get().answers;
+        return [
+          answers[questionId] ?? null,
+          (answer) => {
+            set((state) => ({
+              answers: { ...state.answers, [questionId]: answer ?? undefined },
+            }));
+          },
+        ];
+      },
     }),
     {
       name: "answer-store",
