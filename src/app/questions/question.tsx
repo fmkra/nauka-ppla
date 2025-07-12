@@ -2,9 +2,9 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
-import type { QuestionParsed } from "~/utils";
+import { randomizeQuestion, type QuestionBase } from "~/utils";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -15,7 +15,10 @@ function getStyle(color: string | null) {
   };
 }
 
-export function Question({ question }: { question: QuestionParsed }) {
+export function Question({ question: q }: { question: QuestionBase }) {
+  const question = useMemo(() => randomizeQuestion(q), [q]);
+
+  // It is NOT index of displayed items but index in database (before shuffling)
   const [selected, setSelected] = useState<number | null>(null);
 
   return (
@@ -25,13 +28,13 @@ export function Question({ question }: { question: QuestionParsed }) {
       </CardHeader>
       <CardContent>
         <div className="mb-4 space-y-2">
-          {question.answers.map((answer, index) => (
+          {question.answers.map(([dbIndex, answer], index) => (
             <button
               key={index}
-              onClick={() => setSelected(index === selected ? null : index)}
+              onClick={() => setSelected(dbIndex === selected ? null : dbIndex)}
               className={`block w-full rounded-lg border p-3 text-left ${
-                index === selected
-                  ? selected === question.correctAnswer
+                dbIndex === selected
+                  ? selected === 0
                     ? "border-green-200 bg-green-50 text-green-800"
                     : "border-red-200 bg-red-50 text-red-800"
                   : "border-gray-200 bg-gray-50"
@@ -48,9 +51,7 @@ export function Question({ question }: { question: QuestionParsed }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() =>
-              setSelected(selected === null ? question.correctAnswer : null)
-            }
+            onClick={() => setSelected(selected === null ? 0 : null)}
           >
             {selected === null
               ? "Pokaż prawidłową odpowiedź"

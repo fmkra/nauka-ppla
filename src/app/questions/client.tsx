@@ -7,17 +7,10 @@ import { Filter } from "lucide-react";
 import { api } from "~/trpc/react";
 import { Question } from "./question";
 import { Spinner } from "~/components/ui/spinner";
-import { useState, useEffect, Fragment } from "react";
+import { useEffect, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "~/components/ui/pagination";
-import { Select, type SelectOption } from "~/components/ui/select";
+import { type SelectOption } from "~/components/ui/select";
+import usePagination from "../_components/pagination";
 
 const pageSizeOptions: SelectOption[] = [
   { value: "5", label: "5 pytań" },
@@ -29,87 +22,25 @@ const pageSizeOptions: SelectOption[] = [
 
 export const Client = () => {
   const [search, setSearch] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState("20");
   const searchDebounced = useDebounce(search, 500);
 
-  const limit = parseInt(pageSize);
-  const offset = (currentPage - 1) * limit;
+  const { data: totalCount, isLoading: countLoading } =
+    api.question.getQuestionsCount.useQuery({
+      search: searchDebounced,
+    });
+
+  const pagination = usePagination(pageSizeOptions, "20", totalCount);
+
+  useEffect(() => pagination.setCurrentPage(1), [pagination, searchDebounced]);
 
   const { data: questions, isLoading: questionsLoading } =
-    api.question.getQuestions.useQuery(
-      {
-        search: searchDebounced,
-        limit,
-        offset,
-      },
-      {
-        staleTime: 500,
-      },
-    );
-
-  const { data: totalCount, isLoading: countLoading } =
-    api.question.getQuestionsCount.useQuery(
-      {
-        search: searchDebounced,
-      },
-      {
-        staleTime: 500,
-      },
-    );
+    api.question.getQuestions.useQuery({
+      search: searchDebounced,
+      limit: pagination.limit,
+      offset: pagination.offset,
+    });
 
   const isLoading = questionsLoading || countLoading;
-  const totalPages = Math.ceil((totalCount ?? 0) / limit);
-
-  // Reset to first page when search changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchDebounced]);
-
-  // Reset to first page when page size changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [pageSize]);
-
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
-  const handlePageSizeChange = (value: string) => {
-    setPageSize(value);
-  };
-
-  // Generate page numbers to show
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-
-    if (totalPages <= maxVisiblePages) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      if (currentPage <= 3) {
-        for (let i = 1; i <= 4; i++) {
-          pages.push(i);
-        }
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
-        pages.push(1);
-        for (let i = totalPages - 3; i <= totalPages; i++) {
-          pages.push(i);
-        }
-      } else {
-        pages.push(1);
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pages.push(i);
-        }
-        pages.push(totalPages);
-      }
-    }
-
-    return pages;
-  };
 
   return (
     <div>
@@ -123,14 +54,7 @@ export const Client = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="w-32">
-          <Select
-            options={pageSizeOptions}
-            value={pageSize}
-            onValueChange={handlePageSizeChange}
-            placeholder="Rozmiar strony"
-          />
-        </div>
+        <div className="w-32">{pagination.pageSizeSelector}</div>
         <Button variant="outline">
           <Filter className="mr-2 h-4 w-4" />
           Filtry
@@ -158,8 +82,7 @@ export const Client = () => {
         <>
           <div className="text-muted-foreground mb-4 flex items-center justify-between text-sm">
             <span>
-              Pokazano {offset + 1}-{Math.min(offset + limit, totalCount ?? 0)}{" "}
-              z {totalCount ?? 0} pytań
+              Pokazano {pagination.currentPageRange} z {totalCount ?? 0} pytań
             </span>
           </div>
 
@@ -169,72 +92,7 @@ export const Client = () => {
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-8">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage > 1) {
-                          handlePageChange(currentPage - 1);
-                        }
-                      }}
-                      className={
-                        currentPage <= 1
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
-                    />
-                  </PaginationItem>
-
-                  {getPageNumbers().map((page, index, array) => (
-                    <Fragment key={page}>
-                      {index > 0 && array[index - 1] !== page - 1 && (
-                        <PaginationItem>
-                          <span className="flex h-9 w-9 items-center justify-center text-sm">
-                            ...
-                          </span>
-                        </PaginationItem>
-                      )}
-                      <PaginationItem>
-                        <PaginationLink
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            handlePageChange(page);
-                          }}
-                          isActive={currentPage === page}
-                          className="cursor-pointer"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    </Fragment>
-                  ))}
-
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (currentPage < totalPages) {
-                          handlePageChange(currentPage + 1);
-                        }
-                      }}
-                      className={
-                        currentPage >= totalPages
-                          ? "pointer-events-none opacity-50"
-                          : "cursor-pointer"
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
-            </div>
-          )}
+          {pagination.footer}
         </>
       )}
     </div>

@@ -19,28 +19,27 @@ export interface QuestionBase {
 
 export interface QuestionParsed extends QuestionBase {
   id: string;
-  answers: string[];
+  answers: [number, string][]; // index in database, answer content
   correctAnswer: number;
 }
 
-export function parseQuestions<T extends QuestionBase>(
-  questions: T[],
-): (T & QuestionParsed)[] {
-  return questions.map((question) => {
-    const answers = [
-      question.answerCorrect,
-      question.answersIncorrect1,
-      question.answersIncorrect2,
-      question.answersIncorrect3,
-    ];
-    const permutation = arrayShuffle([0, 1, 2, 3]);
-    const shuffledAnswers = permutation.map(
-      (index) => answers[index],
-    ) as string[];
-    return {
-      ...question,
-      answers: shuffledAnswers,
-      correctAnswer: permutation.indexOf(0),
-    };
-  });
+export function randomizeQuestion<T extends QuestionBase>(
+  question: T,
+): T & QuestionParsed {
+  const permutation = arrayShuffle([0, 1, 2, 3]);
+  const answers = [
+    question.answerCorrect,
+    question.answersIncorrect1,
+    question.answersIncorrect2,
+    question.answersIncorrect3,
+  ];
+  const shuffledAnswers = permutation.map(
+    (index) => [index, answers[index]!] as [number, string],
+  );
+
+  return {
+    ...question,
+    answers: shuffledAnswers,
+    correctAnswer: permutation.indexOf(0),
+  };
 }
