@@ -11,9 +11,9 @@ export interface QuestionBase {
   externalId: string | null;
   question: string;
   answerCorrect: string;
-  answersIncorrect1: string;
-  answersIncorrect2: string;
-  answersIncorrect3: string;
+  answerIncorrect1: string;
+  answerIncorrect2: string;
+  answerIncorrect3: string;
   category: { name: string; color: string | null } | null;
   tags: { tag: { id: number; name: string } }[];
 }
@@ -30,9 +30,9 @@ export function randomizeQuestion<T extends QuestionBase>(
   const permutation = arrayShuffle([0, 1, 2, 3]);
   const answers = [
     question.answerCorrect,
-    question.answersIncorrect1,
-    question.answersIncorrect2,
-    question.answersIncorrect3,
+    question.answerIncorrect1,
+    question.answerIncorrect2,
+    question.answerIncorrect3,
   ];
   const shuffledAnswers = permutation.map(
     (index) => [index, answers[index]!] as [number, string],
