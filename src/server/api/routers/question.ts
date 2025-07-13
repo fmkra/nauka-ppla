@@ -24,9 +24,9 @@ export const questionRouter = createTRPCRouter({
             ilike(questions.externalId, `%${input.search}%`),
             ilike(questions.question, `%${input.search}%`),
             ilike(questions.answerCorrect, `%${input.search}%`),
-            ilike(questions.answersIncorrect1, `%${input.search}%`),
-            ilike(questions.answersIncorrect2, `%${input.search}%`),
-            ilike(questions.answersIncorrect3, `%${input.search}%`),
+            ilike(questions.answerIncorrect1, `%${input.search}%`),
+            ilike(questions.answerIncorrect2, `%${input.search}%`),
+            ilike(questions.answerIncorrect3, `%${input.search}%`),
           ),
         );
       }
@@ -69,9 +69,9 @@ export const questionRouter = createTRPCRouter({
             ilike(questions.externalId, `%${input.search}%`),
             ilike(questions.question, `%${input.search}%`),
             ilike(questions.answerCorrect, `%${input.search}%`),
-            ilike(questions.answersIncorrect1, `%${input.search}%`),
-            ilike(questions.answersIncorrect2, `%${input.search}%`),
-            ilike(questions.answersIncorrect3, `%${input.search}%`),
+            ilike(questions.answerIncorrect1, `%${input.search}%`),
+            ilike(questions.answerIncorrect2, `%${input.search}%`),
+            ilike(questions.answerIncorrect3, `%${input.search}%`),
           ),
         );
       }

@@ -19,9 +19,9 @@ export const questions = createTable("question", (d) => ({
   externalId: d.varchar({ length: 255 }),
   question: d.text().notNull(),
   answerCorrect: d.text().notNull(),
-  answersIncorrect1: d.text().notNull(),
-  answersIncorrect2: d.text().notNull(),
-  answersIncorrect3: d.text().notNull(),
+  answerIncorrect1: d.text().notNull(),
+  answerIncorrect2: d.text().notNull(),
+  answerIncorrect3: d.text().notNull(),
   category: d.integer().references(() => categories.id),
   createdBy: d.varchar({ length: 255 }).references(() => users.id),
   createdAt: d
