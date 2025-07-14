@@ -122,7 +122,9 @@ export default async function LearnCategoryPage({
         </Card>
       </div>
 
-      <CategoryLearningClient category={category} />
+      <div className="flex min-h-[400px] items-center justify-center">
+        <CategoryLearningClient category={category} />
+      </div>
     </div>
   );
 }

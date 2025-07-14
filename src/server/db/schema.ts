@@ -29,6 +29,26 @@ export const questions = createTable("question", (d) => ({
     .default(sql`CURRENT_TIMESTAMP`),
 }));
 
+export const learningProgress = createTable(
+  "learning_progress",
+  (d) => ({
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id),
+    questionId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => questions.id),
+    latestAttempt: d.integer().notNull(),
+    random: d.doublePrecision().notNull(),
+    isDone: d.boolean().notNull(),
+    correctCount: d.integer().notNull(),
+    incorrectCount: d.integer().notNull(),
+  }),
+  (table) => [primaryKey({ columns: [table.userId, table.questionId] })],
+);
+
 export const questionsRelations = relations(questions, ({ many, one }) => ({
   tags: many(questionsToTags),
   category: one(categories, {
@@ -36,6 +56,16 @@ export const questionsRelations = relations(questions, ({ many, one }) => ({
     references: [categories.id],
   }),
 }));
+
+export const learningProgressRelations = relations(
+  learningProgress,
+  ({ one }) => ({
+    question: one(questions, {
+      fields: [learningProgress.questionId],
+      references: [questions.id],
+    }),
+  }),
+);
 
 export const categories = createTable("category", (d) => ({
   id: d.integer().primaryKey().generatedByDefaultAsIdentity(),

@@ -67,7 +67,7 @@ export function Question({ question: q }: { question: QuestionBase }) {
               : "Odznacz odpowiedź"}
           </Button>
           <div className="flex items-start justify-between gap-2">
-            {question.tags.map((tag) => (
+            {question.tags?.map((tag) => (
               <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
             ))}
             {question.category && (
