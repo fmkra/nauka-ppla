@@ -1,11 +1,15 @@
 import { z } from "zod";
-import { ilike, or, count, sql, and, inArray, eq, gte, asc } from "drizzle-orm";
+import { sql, and, eq, gte, asc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { learningProgress as lp, questions } from "~/server/db/schema";
+import {
+  learningProgress as lp,
+  learningCategory,
+  questions,
+} from "~/server/db/schema";
 
 export const learningRouter = createTRPCRouter({
-  resetLearningCategory: protectedProcedure
+  resetLearningProgress: protectedProcedure
     .input(
       z.object({
         categoryId: z.number(),
@@ -35,6 +39,32 @@ export const learningRouter = createTRPCRouter({
           \"${sql.raw(lp.random.name)}\" = RANDOM(),
           \"${sql.raw(lp.isDone.name)}\" = false
       `);
+
+      await ctx.db.execute(sql`
+        INSERT INTO ${learningCategory} (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\", \"${sql.raw(learningCategory.latestAttempt.name)}\")
+        VALUES (${ctx.session.user.id}, ${input.categoryId}, 1)
+        ON CONFLICT (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\") DO UPDATE SET 
+          \"${sql.raw(learningCategory.latestAttempt.name)}\" = 1
+      `);
+    }),
+
+  deleteLearningProgress: protectedProcedure
+    .input(
+      z.object({
+        categoryId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.execute(sql`
+        DELETE ${lp} FROM ${lp}
+        INNER JOIN ${questions} ON ${lp.questionId} = ${questions.id}
+        WHERE ${lp.userId} = ${ctx.session.user.id} AND ${questions.category} = ${input.categoryId}
+      `);
+
+      await ctx.db.execute(sql`
+        DELETE FROM ${learningCategory}
+        WHERE \"${sql.raw(learningCategory.userId.name)}\" = ${ctx.session.user.id} AND \"${sql.raw(learningCategory.categoryId.name)}\" = ${input.categoryId}
+      `);
     }),
 
   getAttempt: protectedProcedure
@@ -44,29 +74,24 @@ export const learningRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      // Current attempt is the smallest latestAttempt among questions that were not answered in previous attempts.
-
-      const { currentAttempt, questionCount } = (
+      const attempt = (
         await ctx.db
           .select({
-            currentAttempt: sql<number>`MIN(\"latestAttempt\") FILTER (WHERE \"isDone\" = false)`,
-            questionCount: sql<number>`COUNT(*)`,
+            currentAttempt: learningCategory.latestAttempt,
           })
-          .from(lp)
-          .innerJoin(questions, eq(lp.questionId, questions.id))
+          .from(learningCategory)
           .where(
             and(
-              eq(lp.userId, ctx.session.user.id),
-              eq(questions.category, input.categoryId),
+              eq(learningCategory.userId, ctx.session.user.id),
+              eq(learningCategory.categoryId, input.categoryId),
             ),
           )
-      )[0]!;
+      )[0];
 
-      const isComplete = questionCount > 0;
-
-      if (currentAttempt === null) {
-        return { isComplete, attempt: null };
+      if (attempt === undefined) {
+        return null;
       }
+      const { currentAttempt } = attempt;
 
       // Questions that were answered correctly in previous attempts have latestAttempt < attemptNumber.
       // Questions that were answered correctly in this attempt have isDone = true and latestAttempt = attemptNumber.
@@ -88,23 +113,34 @@ export const learningRouter = createTRPCRouter({
       const answeredCorrectly = Number(q[0]!.answeredCorrectly);
       const answeredIncorrectly = Number(q[0]!.answeredIncorrectly);
       const notAnswered = Number(q[0]!.notAnswered);
-      const currentQuestion = answeredCorrectly + answeredIncorrectly;
-      const totalThisAttempt = currentQuestion + notAnswered;
-      const total = previouslyAnswered + totalThisAttempt;
 
       return {
-        isComplete: false,
-        attempt: {
-          currentAttempt,
-          previouslyAnswered,
-          answeredCorrectly,
-          answeredIncorrectly,
-          notAnswered,
-          currentQuestion,
-          totalThisAttempt,
-          total,
-        },
+        currentAttempt,
+        previouslyAnswered,
+        answeredCorrectly,
+        answeredIncorrectly,
+        notAnswered,
       };
+    }),
+
+  nextAttempt: protectedProcedure
+    .input(
+      z.object({
+        categoryId: z.number(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(learningCategory)
+        .set({
+          latestAttempt: sql`${learningCategory.latestAttempt} + 1`,
+        })
+        .where(
+          and(
+            eq(learningCategory.userId, ctx.session.user.id),
+            eq(learningCategory.categoryId, input.categoryId),
+          ),
+        );
     }),
 
   getQuestion: protectedProcedure

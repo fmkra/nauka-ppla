@@ -1,5 +1,3 @@
-import type { inferRouterOutputs } from "@trpc/server";
-import type { AppRouter } from "~/server/api/root";
 import {
   Card,
   CardContent,
@@ -8,19 +6,29 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-
-type AttemptData = Exclude<
-  inferRouterOutputs<AppRouter>["learning"]["getAttempt"]["attempt"],
-  null
->;
+import type { ExtendedAttempt } from "~/app/learn/[category]/category-learning-client";
+import { api } from "~/trpc/react";
 
 export function LearningAttemptSummary({
   attempt,
-  startNextAttempt,
+  categoryId,
+  nextAttempt,
 }: {
-  attempt: AttemptData;
-  startNextAttempt: () => void;
+  attempt: ExtendedAttempt;
+  categoryId: number;
+  nextAttempt: () => void;
 }) {
+  const { mutate } = api.learning.nextAttempt.useMutation({
+    onSuccess: () => {
+      console.log("calling nextAttempt");
+      nextAttempt();
+    },
+  });
+
+  const startNextAttempt = () => {
+    mutate({ categoryId });
+  };
+
   return (
     <Card className="mx-auto w-full max-w-4xl">
       <CardHeader>
@@ -42,7 +50,7 @@ export function LearningAttemptSummary({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Button onClick={startNextAttempt}>Rozpocznij nowe podejście</Button>
+        <Button onClick={startNextAttempt}>Rozpocznij kolejne podejście</Button>
       </CardContent>
     </Card>
   );

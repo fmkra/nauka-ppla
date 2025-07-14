@@ -20,7 +20,7 @@ export function LearningBeginMenu({
   onLoaded: () => void;
   onLoadingBegin: () => void;
 }) {
-  const { mutate } = api.learning.resetLearningCategory.useMutation({
+  const { mutate } = api.learning.resetLearningProgress.useMutation({
     onSuccess: () => {
       onLoaded();
     },

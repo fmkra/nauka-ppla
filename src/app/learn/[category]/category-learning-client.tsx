@@ -7,6 +7,8 @@ import { LearningQuestions } from "~/app/_components/learning/learning-questions
 import { useEffect, useState } from "react";
 import { LearningAttemptSummary } from "~/app/_components/learning/attempt-summary";
 import { LearningFinished } from "~/app/_components/learning/learning-finished";
+import type { AppRouter } from "~/server/api/root";
+import type { inferRouterOutputs } from "@trpc/server";
 
 interface CategoryLearningClientProps {
   category: {
@@ -18,56 +20,74 @@ interface CategoryLearningClientProps {
   };
 }
 
+type AttemptData = inferRouterOutputs<AppRouter>["learning"]["getAttempt"];
+
+export function extendAttempt(attempt: AttemptData | undefined | null) {
+  if (!attempt) return attempt;
+  return {
+    ...attempt,
+    questionNumber: attempt.answeredCorrectly + attempt.answeredIncorrectly,
+    attemptQuestionCount:
+      attempt.answeredCorrectly +
+      attempt.answeredIncorrectly +
+      attempt.notAnswered,
+  };
+}
+
+export type ExtendedAttempt = Exclude<
+  ReturnType<typeof extendAttempt>,
+  null | undefined
+>;
+
 export function CategoryLearningClient({
   category,
 }: CategoryLearningClientProps) {
-  const { data, refetch: refetchAttempt } = api.learning.getAttempt.useQuery({
-    categoryId: category.id,
-  });
+  const { data: _attempt, refetch: refetchAttempt } =
+    api.learning.getAttempt.useQuery({
+      categoryId: category.id,
+    });
+  const attempt = extendAttempt(_attempt);
 
   const utils = api.useUtils();
+
   const nextQuestion = (isCorrect: boolean) => {
     utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
-      if (!old?.attempt) return old;
-      const attempt = {
-        ...old.attempt,
-        currentQuestion: old.attempt.currentQuestion + 1,
-        answeredCorrectly: old.attempt.answeredCorrectly + (isCorrect ? 1 : 0),
-        answeredIncorrectly:
-          old.attempt.answeredIncorrectly + (isCorrect ? 0 : 1),
-        notAnswered: old.attempt.notAnswered - 1,
-      };
-      // TODO: handle next attempt here instead of refetching attempt
+      if (!old) return old;
       return {
-        isComplete:
-          attempt.notAnswered === 0 && attempt.answeredIncorrectly == 0
-            ? true
-            : old.isComplete,
-        attempt,
+        ...old,
+        answeredCorrectly: old.answeredCorrectly + (isCorrect ? 1 : 0),
+        answeredIncorrectly: old.answeredIncorrectly + (isCorrect ? 0 : 1),
+        notAnswered: old.notAnswered - 1,
       };
     });
   };
 
-  // const [state, setState] = useState<{
-  //   attempt: number;
-  //   questionNumber: number;
-  // } | null>(null);
+  const nextAttempt = () => {
+    utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
+      // Next attempt can only be started if there are questions left to answer
+      console.log("old", old);
+      if (!old || old.notAnswered !== 0) return old;
+      return {
+        ...old,
+        currentAttempt: old.currentAttempt + 1,
+        answeredCorrectly: 0,
+        answeredIncorrectly: 0,
+        previouslyAnswered: old.previouslyAnswered + old.answeredCorrectly,
+        notAnswered: old.answeredIncorrectly,
+        questionNumber: 0,
+        attemptQuestionCount: old.answeredIncorrectly,
+      };
+    });
+  };
 
-  // useEffect(() => {
-  //   setState()
-  // }, [data])
-
-  const isAttemptDone = data?.attempt
-    ? data.attempt.currentQuestion === data.attempt.totalThisAttempt
-    : false;
   const { data: question } = api.learning.getQuestion.useQuery(
     {
       categoryId: category.id,
-      attemptNumber: data?.attempt?.currentAttempt ?? 0,
-      questionNumber: data?.attempt?.currentQuestion ?? 0,
+      attemptNumber: attempt?.currentAttempt ?? 0,
+      questionNumber: attempt?.questionNumber ?? 0,
     },
     {
-      enabled: !!data?.attempt && !isAttemptDone,
+      enabled: !!attempt && attempt.notAnswered > 0,
     },
   );
 
@@ -77,35 +97,34 @@ export function CategoryLearningClient({
     setIsLoading(false);
   }, [question]);
 
-  if (!data || isLoading) {
+  if (attempt === undefined || isLoading) {
     return <Spinner />;
     // TODO: handle error message
   }
-  if (data.isComplete) {
-    return (
-      <LearningFinished
-        categoryId={category.id}
-        onLoadingBegin={() => setIsLoading(true)}
-        onLoaded={refetchAttempt}
-      />
-    );
+
+  if (!!attempt && attempt.notAnswered === 0) {
+    if (attempt.answeredIncorrectly === 0)
+      return (
+        <LearningFinished
+          categoryId={category.id}
+          onResetBegin={() => setIsLoading(true)}
+          onResetFinished={refetchAttempt}
+        />
+      );
+    else
+      return (
+        <LearningAttemptSummary
+          attempt={attempt}
+          categoryId={category.id}
+          nextAttempt={nextAttempt}
+        />
+      );
   }
 
-  if (isAttemptDone) {
-    return (
-      <LearningAttemptSummary
-        attempt={data.attempt!}
-        startNextAttempt={() => {
-          void refetchAttempt();
-        }}
-      />
-    );
-  }
-
-  if (data.attempt)
+  if (attempt)
     return (
       <LearningQuestions
-        attempt={data.attempt}
+        attempt={attempt}
         question={question}
         answerQuestion={nextQuestion}
       />

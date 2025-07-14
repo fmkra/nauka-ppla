@@ -9,14 +9,14 @@ import { api } from "~/trpc/react";
 
 export function LearningFinished({
   categoryId,
-  onLoadingBegin,
-  onLoaded,
+  onResetBegin: onLoadingBegin,
+  onResetFinished: onLoaded,
 }: {
   categoryId: number;
-  onLoadingBegin: () => void;
-  onLoaded: () => void;
+  onResetBegin: () => void;
+  onResetFinished: () => void;
 }) {
-  const { mutate } = api.learning.resetLearningCategory.useMutation({
+  const { mutate } = api.learning.resetLearningProgress.useMutation({
     onSuccess: () => {
       onLoaded();
     },

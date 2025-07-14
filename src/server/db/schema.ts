@@ -49,6 +49,22 @@ export const learningProgress = createTable(
   (table) => [primaryKey({ columns: [table.userId, table.questionId] })],
 );
 
+export const learningCategory = createTable(
+  "learning_category",
+  (d) => ({
+    userId: d
+      .varchar({ length: 255 })
+      .notNull()
+      .references(() => users.id),
+    categoryId: d
+      .integer()
+      .notNull()
+      .references(() => categories.id),
+    latestAttempt: d.integer().notNull(),
+  }),
+  (table) => [primaryKey({ columns: [table.userId, table.categoryId] })],
+);
+
 export const questionsRelations = relations(questions, ({ many, one }) => ({
   tags: many(questionsToTags),
   category: one(categories, {

@@ -4,11 +4,7 @@ import { LearningProgressBar } from "./progress-bar";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-
-type AttemptData = Exclude<
-  inferRouterOutputs<AppRouter>["learning"]["getAttempt"]["attempt"],
-  null
->;
+import type { ExtendedAttempt } from "~/app/learn/[category]/category-learning-client";
 
 type Question = inferRouterOutputs<AppRouter>["learning"]["getQuestion"];
 
@@ -17,11 +13,12 @@ export function LearningQuestions({
   question,
   answerQuestion,
 }: {
-  attempt: AttemptData;
+  attempt: ExtendedAttempt;
   question: Question;
   answerQuestion: (isCorrect: boolean) => void;
 }) {
-  const { mutate } = api.learning.answerQuestion.useMutation({
+  // TODO: after adding optimistic update, remove isPending
+  const { mutate, isPending } = api.learning.answerQuestion.useMutation({
     onSuccess: (_, { isCorrect }) => {
       answerQuestion(isCorrect);
     },
@@ -41,14 +38,19 @@ export function LearningQuestions({
       <Card className="mx-auto w-full max-w-4xl">
         <CardHeader>
           <CardTitle>
-            Pytanie {attempt.currentQuestion + 1} z {attempt.totalThisAttempt}
+            Pytanie {attempt.questionNumber + 1} z{" "}
+            {attempt.attemptQuestionCount}
           </CardTitle>
           <LearningProgressBar attempt={attempt} />
         </CardHeader>
         <CardContent>
           <pre>{JSON.stringify(question, null, 2)}</pre>
-          <Button onClick={() => answer(true)}>Correct</Button>
-          <Button onClick={() => answer(false)}>Incorrect</Button>
+          <Button disabled={isPending} onClick={() => answer(true)}>
+            Correct
+          </Button>
+          <Button disabled={isPending} onClick={() => answer(false)}>
+            Incorrect
+          </Button>
         </CardContent>
       </Card>
     </div>
