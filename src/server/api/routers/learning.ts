@@ -13,6 +13,7 @@ export const learningRouter = createTRPCRouter({
     .input(
       z.object({
         categoryId: z.number(),
+        isRandom: z.boolean(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,7 +29,7 @@ export const learningRouter = createTRPCRouter({
           ${ctx.session.user.id} AS ${sql.raw(lp.userId.name)},
           ${questions.id} AS ${sql.raw(lp.questionId.name)},
           1 AS ${sql.raw(lp.latestAttempt.name)},
-          RANDOM() AS ${sql.raw(lp.random.name)},
+          RANDOM() * ${input.isRandom ? 1 : 0} AS ${sql.raw(lp.random.name)},
           false AS ${sql.raw(lp.isDone.name)},
           0 AS ${sql.raw(lp.correctCount.name)},
           0 AS ${sql.raw(lp.incorrectCount.name)}
@@ -36,7 +37,7 @@ export const learningRouter = createTRPCRouter({
         WHERE ${questions.category} = ${input.categoryId}
         ON CONFLICT (\"${sql.raw(lp.userId.name)}\", \"${sql.raw(lp.questionId.name)}\") DO UPDATE SET
           \"${sql.raw(lp.latestAttempt.name)}\" = 1,
-          \"${sql.raw(lp.random.name)}\" = RANDOM(),
+          \"${sql.raw(lp.random.name)}\" = RANDOM() * ${input.isRandom ? 1 : 0},
           \"${sql.raw(lp.isDone.name)}\" = false
       `);
 
@@ -165,7 +166,7 @@ export const learningRouter = createTRPCRouter({
             gte(lp.latestAttempt, input.attemptNumber),
           ),
         )
-        .orderBy(asc(lp.random))
+        .orderBy(asc(lp.random), asc(questions.externalId), asc(questions.id))
         .limit(1)
         .offset(input.questionNumber);
 

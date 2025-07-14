@@ -91,6 +91,11 @@ export function CategoryLearningClient({
     },
   );
 
+  const onLearningReset = async () => {
+    await utils.learning.getQuestion.reset();
+    await utils.learning.getAttempt.reset();
+  };
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -108,7 +113,7 @@ export function CategoryLearningClient({
         <LearningFinished
           categoryId={category.id}
           onResetBegin={() => setIsLoading(true)}
-          onResetFinished={refetchAttempt}
+          onResetFinished={onLearningReset}
         />
       );
     else

@@ -5,6 +5,9 @@ import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type { ExtendedAttempt } from "~/app/learn/[category]/category-learning-client";
+import { cn, randomizeQuestion } from "~/utils";
+import { useMemo, useState } from "react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 type Question = inferRouterOutputs<AppRouter>["learning"]["getQuestion"];
 
@@ -24,13 +27,25 @@ export function LearningQuestions({
     },
   });
 
-  const answer = (isCorrect: boolean) => {
-    if (!question) return;
-    mutate({
-      questionId: question.question.id,
-      attemptNumber: attempt.currentAttempt,
-      isCorrect,
+  const parsedQuestion = useMemo(() => {
+    // TODO: randomness based on data from db (random and latestAttempt)
+    if (!question) return null;
+    return randomizeQuestion({
+      ...question.question,
+      category: { name: "test", color: null }, // TODO: remove
     });
+  }, [question]);
+
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const next = () => {
+    if (!parsedQuestion) return;
+    mutate({
+      questionId: parsedQuestion.id,
+      attemptNumber: attempt.currentAttempt,
+      isCorrect: selected === 0,
+    });
+    setSelected(null);
   };
 
   return (
@@ -44,13 +59,51 @@ export function LearningQuestions({
           <LearningProgressBar attempt={attempt} />
         </CardHeader>
         <CardContent>
-          <pre>{JSON.stringify(question, null, 2)}</pre>
-          <Button disabled={isPending} onClick={() => answer(true)}>
-            Correct
-          </Button>
-          <Button disabled={isPending} onClick={() => answer(false)}>
-            Incorrect
-          </Button>
+          {!!parsedQuestion?.question && (
+            <p className="mb-4">
+              {!!parsedQuestion?.externalId && (
+                <span>{parsedQuestion.externalId}: </span>
+              )}
+              {parsedQuestion?.question}
+            </p>
+          )}
+          <div className="mb-4 space-y-2">
+            {parsedQuestion ? (
+              parsedQuestion.answers.map(([dbIndex, answer], index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelected(selected ?? dbIndex)}
+                  className={cn(
+                    `block w-full rounded-lg border p-3 text-left`,
+                    dbIndex === 0 && selected !== null
+                      ? "border-green-200 bg-green-50 text-green-800"
+                      : selected === dbIndex
+                        ? "border-red-200 bg-red-50 text-red-800"
+                        : "border-gray-200 bg-gray-50",
+                  )}
+                >
+                  <span className="mr-2 font-medium">
+                    {String.fromCharCode(65 + index)}.
+                  </span>
+                  {answer}
+                </button>
+              ))
+            ) : (
+              <div className="flex flex-col gap-2">
+                <Skeleton className="h-4 w-full rounded-none" />
+                <Skeleton className="h-4 w-1/3 rounded-none" />
+                <Skeleton className="h-[50px] w-full rounded-lg border text-left" />
+                <Skeleton className="h-[50px] w-full rounded-lg border text-left" />
+                <Skeleton className="h-[50px] w-full rounded-lg border text-left" />
+                <Skeleton className="h-[50px] w-full rounded-lg border text-left" />
+              </div>
+            )}
+          </div>
+          <div className="flex w-full justify-end">
+            <Button disabled={isPending || selected === null} onClick={next}>
+              Dalej
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>

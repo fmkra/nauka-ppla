@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import {
   Card,
@@ -5,6 +6,8 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
 import { api } from "~/trpc/react";
 
 export function LearningFinished({
@@ -22,8 +25,10 @@ export function LearningFinished({
     },
   });
 
+  const [isRandom, setIsRandom] = useState(false);
+
   const startNewAttempt = () => {
-    mutate({ categoryId });
+    mutate({ categoryId, isRandom });
     onLoadingBegin();
   };
 
@@ -32,9 +37,19 @@ export function LearningFinished({
   return (
     <Card className="mx-auto w-full max-w-2xl">
       <CardHeader className="text-center">
-        <CardTitle>You have finished learning this category.</CardTitle>
+        <CardTitle>Zakończyłeś naukę tego przedmiotu</CardTitle>
         <CardDescription>
-          <Button onClick={startNewAttempt}>Start new attempt</Button>
+          <div className="my-4 flex items-center justify-center gap-2">
+            <Checkbox
+              id="isRandom"
+              checked={isRandom}
+              onCheckedChange={() => setIsRandom(!isRandom)}
+            />
+            <Label htmlFor="isRandom">Losowa kolejność pytań</Label>
+          </div>
+          <Button onClick={startNewAttempt}>
+            Zresetuj postęp i zacznij od nowa
+          </Button>
         </CardDescription>
       </CardHeader>
     </Card>

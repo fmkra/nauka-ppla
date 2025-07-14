@@ -10,6 +10,9 @@ import {
 } from "~/components/ui/card";
 import { BookOpen, Play } from "lucide-react";
 import { api } from "~/trpc/react";
+import { useState } from "react";
+import { Checkbox } from "~/components/ui/checkbox";
+import { Label } from "~/components/ui/label";
 
 export function LearningBeginMenu({
   categoryId,
@@ -26,9 +29,11 @@ export function LearningBeginMenu({
     },
   });
 
+  const [isRandom, setIsRandom] = useState(false);
+
   const handleBeginLearning = () => {
     onLoadingBegin();
-    mutate({ categoryId });
+    mutate({ categoryId, isRandom });
   };
 
   return (
@@ -47,6 +52,14 @@ export function LearningBeginMenu({
         </CardDescription>
       </CardHeader>
       <CardContent className="text-center">
+        <div className="mb-4 flex items-center justify-center gap-2">
+          <Checkbox
+            id="isRandom"
+            checked={isRandom}
+            onCheckedChange={() => setIsRandom(!isRandom)}
+          />
+          <Label htmlFor="isRandom">Losowa kolejność pytań</Label>
+        </div>
         <Button
           onClick={handleBeginLearning}
           size="lg"
