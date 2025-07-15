@@ -1,7 +1,9 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { db } from "~/server/db";
-import { categories, questions } from "~/server/db/schema";
+import { categories } from "~/server/db/category";
+import { licenses } from "~/server/db/license";
+import { questionInstances } from "~/server/db/question";
 import { count } from "drizzle-orm";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
@@ -10,36 +12,42 @@ import * as icons from "lucide-react";
 import Link from "next/link";
 import { CategoryLearningClient } from "./category-learning-client";
 import { formatTime, MINUTES_PER_QUESTION } from "~/utils";
+import { auth } from "~/server/auth";
 
 export default async function LearnCategoryPage({
   params,
 }: {
-  params: Promise<{ category: string }>;
+  params: Promise<{ category: string; license: string }>;
 }) {
-  const { category: categoryUrl } = await params;
+  const { category: categoryUrl, license: licenseUrl } = await params;
+  const session = await auth();
 
-  const category = (
+  const categoryData = (
     await db
       .select({
         id: categories.id,
         name: categories.name,
         url: categories.url,
         description: categories.description,
-        questionCount: count(questions.id),
+        questionCount: count(questionInstances.id),
       })
       .from(categories)
-      .leftJoin(questions, eq(categories.id, questions.category))
-      .where(eq(categories.url, categoryUrl))
+      .leftJoin(
+        questionInstances,
+        eq(categories.id, questionInstances.categoryId),
+      )
+      .leftJoin(licenses, eq(categories.licenseId, licenses.id))
+      .where(and(eq(categories.url, categoryUrl), eq(licenses.url, licenseUrl)))
       .groupBy(categories.id)
       .limit(1)
   )[0];
 
-  if (!category) {
+  if (!categoryData) {
     notFound();
   }
 
   const [description, icon, ...topics] =
-    category.description?.split("\n") ?? [];
+    categoryData.description?.split("\n") ?? [];
   if (!icon) return null;
   const Icon = icons[icon as keyof typeof icons] as React.ElementType;
 
@@ -48,9 +56,9 @@ export default async function LearnCategoryPage({
       <div className="mb-8">
         <div className="mb-4 flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/learn">
+            <Link href={`/learn/${licenseUrl}`}>
               <icons.ArrowLeft className="mr-2 h-4 w-4" />
-              Powrót do kategorii
+              Powrót do przedmiotów
             </Link>
           </Button>
         </div>
@@ -59,7 +67,7 @@ export default async function LearnCategoryPage({
           <div>
             <h1 className="mb-2 flex items-center text-3xl font-bold">
               <Icon className="mr-2 h-6 w-6" />
-              {category.name}
+              {categoryData.name}
             </h1>
             <p className="text-muted-foreground mb-4 max-w-2xl">
               {description}
@@ -85,7 +93,9 @@ export default async function LearnCategoryPage({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{category.questionCount}</div>
+            <div className="text-2xl font-bold">
+              {categoryData.questionCount}
+            </div>
           </CardContent>
         </Card>
 
@@ -113,7 +123,7 @@ export default async function LearnCategoryPage({
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatTime(category.questionCount * MINUTES_PER_QUESTION)}
+              {formatTime(categoryData.questionCount * MINUTES_PER_QUESTION)}
             </div>
             <p className="text-muted-foreground text-xs">
               ~{MINUTES_PER_QUESTION} min na pytanie
@@ -123,15 +133,25 @@ export default async function LearnCategoryPage({
       </div>
 
       <div className="flex min-h-[400px] items-center justify-center">
-        <CategoryLearningClient category={category} />
+        {session?.user ? (
+          <CategoryLearningClient category={categoryData} />
+        ) : (
+          <div className="flex flex-col items-center justify-center">
+            <h1 className="text-2xl font-bold">Zaloguj się aby kontynuować</h1>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 export async function generateStaticParams() {
-  const cats = await db.select().from(categories);
-  return cats.map((category) => ({
-    category: category.url,
+  const pages = await db
+    .select()
+    .from(categories)
+    .innerJoin(licenses, eq(categories.licenseId, licenses.id));
+  return pages.map((page) => ({
+    category: page.category.url,
+    license: page.license.url,
   }));
 }

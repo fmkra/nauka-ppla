@@ -1,5 +1,5 @@
 import { postRouter } from "~/server/api/routers/post";
-import { questionRouter } from "~/server/api/routers/question";
+import { questionDatabaseRouter } from "~/server/api/routers/question_database";
 import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
 import { learningRouter } from "./routers/learning";
 
@@ -9,7 +9,7 @@ import { learningRouter } from "./routers/learning";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  question: questionRouter,
+  questionDatabase: questionDatabaseRouter,
   post: postRouter,
   learning: learningRouter,
 });

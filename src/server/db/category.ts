@@ -1,0 +1,26 @@
+import { unique } from "drizzle-orm/pg-core";
+import { createTable } from "./creator";
+import { relations } from "drizzle-orm";
+import { licenses } from "./license";
+import { questionInstances } from "./question";
+
+export const categories = createTable(
+  "category",
+  (d) => ({
+    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
+    name: d.varchar({ length: 255 }).notNull(),
+    url: d.varchar({ length: 255 }).notNull(),
+    color: d.varchar({ length: 15 }),
+    description: d.text(),
+    licenseId: d.integer().references(() => licenses.id),
+  }),
+  (t) => [unique().on(t.url, t.licenseId)],
+);
+
+export const categoriesRelations = relations(categories, ({ many, one }) => ({
+  questionInstances: many(questionInstances),
+  license: one(licenses, {
+    fields: [categories.licenseId],
+    references: [licenses.id],
+  }),
+}));

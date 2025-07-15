@@ -10,6 +10,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { type SelectOption } from "~/components/ui/select";
 import usePagination from "../_components/pagination";
 import { CategoryFilter } from "./category-filter";
+import { LicenseFilter } from "./license-filter";
 
 const pageSizeOptions: SelectOption[] = [
   { value: "5", label: "5 pytań" },
@@ -22,10 +23,11 @@ const pageSizeOptions: SelectOption[] = [
 export default function QuestionsPage() {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedLicenses, setSelectedLicenses] = useState<number[]>([]);
   const searchDebounced = useDebounce(search, 500);
 
   const { data: totalCount, isLoading: countLoading } =
-    api.question.getQuestionsCount.useQuery({
+    api.questionDatabase.getQuestionsCount.useQuery({
       search: searchDebounced,
       categoryIds:
         selectedCategories.length > 0 ? selectedCategories : undefined,
@@ -39,7 +41,7 @@ export default function QuestionsPage() {
   }, [setCurrentPage, searchDebounced, selectedCategories]);
 
   const { data: questions, isLoading: questionsLoading } =
-    api.question.getQuestions.useQuery({
+    api.questionDatabase.getQuestions.useQuery({
       search: searchDebounced,
       categoryIds:
         selectedCategories.length > 0 ? selectedCategories : undefined,
@@ -69,7 +71,12 @@ export default function QuestionsPage() {
           />
         </div>
         <div className="w-32">{pagination.pageSizeSelector}</div>
+        <LicenseFilter
+          selectedLicenses={selectedLicenses}
+          onLicensesChange={setSelectedLicenses}
+        />
         <CategoryFilter
+          licenseIds={selectedLicenses}
           selectedCategories={selectedCategories}
           onCategoriesChange={setSelectedCategories}
         />
@@ -101,8 +108,8 @@ export default function QuestionsPage() {
           </div>
 
           <div className="grid gap-6">
-            {questions.map((question) => (
-              <Question question={question} key={question.id} />
+            {questions.map((q) => (
+              <Question question={q} key={q.question.id} showLicense={true} />
             ))}
           </div>
 

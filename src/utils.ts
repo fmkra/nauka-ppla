@@ -14,8 +14,6 @@ export interface QuestionBase {
   answerIncorrect1: string;
   answerIncorrect2: string;
   answerIncorrect3: string;
-  category: { name: string; color: string | null } | null;
-  tags?: { tag: { id: number; name: string } }[]; // TODO: should be required
 }
 
 export interface QuestionParsed extends QuestionBase {

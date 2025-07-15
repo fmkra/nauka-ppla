@@ -13,6 +13,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useAnswerStore } from "~/stores";
+import type { CategoryAgg } from "~/server/api/routers/question_database";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -23,8 +24,19 @@ function getStyle(color: string | null) {
   };
 }
 
-export function Question({ question: q }: { question: QuestionBase }) {
-  const question = useMemo(() => randomizeQuestion(q), [q]);
+type QuestionArg = {
+  question: QuestionBase;
+  categories: CategoryAgg[];
+};
+
+export function Question({
+  question: q,
+  showLicense,
+}: {
+  question: QuestionArg;
+  showLicense: boolean;
+}) {
+  const question = useMemo(() => randomizeQuestion(q.question), [q]);
 
   const { answerState } = useAnswerStore();
   // `selected` is NOT index of displayed items but index in database (before shuffling)
@@ -67,17 +79,19 @@ export function Question({ question: q }: { question: QuestionBase }) {
               : "Odznacz odpowiedź"}
           </Button>
           <div className="flex items-start justify-between gap-2">
-            {question.tags?.map((tag) => (
+            {/* {question.tags?.map((tag) => (
               <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
-            ))}
-            {question.category && (
+            ))} */}
+            {q.categories.map((category) => (
               <Badge
                 variant="secondary"
-                style={getStyle(question.category.color)}
+                style={getStyle(category.color)}
+                key={category.id}
               >
-                {question.category.name}
+                {(showLicense ? category.license.name + ": " : "") +
+                  category.name}
               </Badge>
-            )}
+            ))}
             {question.externalId && (
               <TooltipProvider>
                 <Tooltip>

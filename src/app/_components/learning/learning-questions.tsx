@@ -4,7 +4,7 @@ import { LearningProgressBar } from "./progress-bar";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { ExtendedAttempt } from "~/app/learn/[category]/category-learning-client";
+import type { ExtendedAttempt } from "~/app/learn/[license]/[category]/category-learning-client";
 import { cn, randomizeQuestion } from "~/utils";
 import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -30,18 +30,15 @@ export function LearningQuestions({
   const parsedQuestion = useMemo(() => {
     // TODO: randomness based on data from db (random and latestAttempt)
     if (!question) return null;
-    return randomizeQuestion({
-      ...question.question,
-      category: { name: "test", color: null }, // TODO: remove
-    });
+    return randomizeQuestion(question.question);
   }, [question]);
 
   const [selected, setSelected] = useState<number | null>(null);
 
   const next = () => {
-    if (!parsedQuestion) return;
+    if (!parsedQuestion || !question) return;
     mutate({
-      questionId: parsedQuestion.id,
+      questionInstanceId: question.question_instance.id,
       attemptNumber: attempt.currentAttempt,
       isCorrect: selected === 0,
     });

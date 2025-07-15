@@ -40,12 +40,16 @@ const useTimer = (timeLength: number, beginTime_?: number) => {
 };
 
 export default function ExamPage() {
-  const { data } = api.question.getQuestions.useQuery({
+  // TODO: use different endpoint
+  const { data } = api.questionDatabase.getQuestions.useQuery({
     limit: 20,
     randomOrder: true,
   });
 
-  const questions = useMemo(() => data?.map(randomizeQuestion), [data]);
+  const questions = useMemo(
+    () => data?.map((x) => randomizeQuestion(x.question)),
+    [data],
+  );
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<

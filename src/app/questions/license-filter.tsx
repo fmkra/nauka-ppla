@@ -15,53 +15,39 @@ import { api } from "~/trpc/react";
 import { Spinner } from "~/components/ui/spinner";
 import { conjugate } from "~/utils";
 
-function getStyle(color: string | null) {
-  const colors = color?.split(",");
-  if (colors?.length != 2) return {};
-  return {
-    backgroundColor: colors[0],
-    borderColor: colors[1],
-  };
+interface LicenseFilterProps {
+  selectedLicenses: number[];
+  onLicensesChange: (licenses: number[]) => void;
 }
 
-interface CategoryFilterProps {
-  licenseIds: number[];
-  selectedCategories: number[];
-  onCategoriesChange: (categories: number[]) => void;
-}
-
-export function CategoryFilter({
-  licenseIds,
-  selectedCategories,
-  onCategoriesChange,
-}: CategoryFilterProps) {
+export function LicenseFilter({
+  selectedLicenses,
+  onLicensesChange,
+}: LicenseFilterProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: categories, isLoading } =
-    api.questionDatabase.getCategories.useQuery({
-      licenseIds,
-    });
+  const { data: licenses, isLoading } =
+    api.questionDatabase.getLicenses.useQuery();
 
-  const handleCategoryToggle = (categoryId: number) => {
-    const newSelected = selectedCategories.includes(categoryId)
-      ? selectedCategories.filter((id) => id !== categoryId)
-      : [...selectedCategories, categoryId];
-    onCategoriesChange(newSelected);
+  const handleLicenseToggle = (licenseId: number) => {
+    const newSelected = selectedLicenses.includes(licenseId)
+      ? selectedLicenses.filter((id) => id !== licenseId)
+      : [...selectedLicenses, licenseId];
+    onLicensesChange(newSelected);
   };
 
   const handleSelectAll = () => {
-    if (categories) {
-      onCategoriesChange(categories.map((cat) => cat.id));
+    if (licenses) {
+      onLicensesChange(licenses.map((license) => license.id));
     }
   };
 
   const handleClearAll = () => {
-    onCategoriesChange([]);
+    onLicensesChange([]);
   };
 
-  const selectedCount = selectedCategories.length;
-  const totalCount = categories?.length ?? 0;
-  const showLicenseName = licenseIds.length !== 1;
+  const selectedCount = selectedLicenses.length;
+  const totalCount = licenses?.length ?? 0;
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -69,16 +55,16 @@ export function CategoryFilter({
         <Button variant="outline" className="justify-between">
           <span>
             {selectedCount == 0 || selectedCount == totalCount
-              ? "Wszystkie kategorie"
+              ? "Wszystkie licencje"
               : selectedCount +
                 " " +
-                conjugate(selectedCount, "kategoria", "kategorie", "kategorii")}
+                conjugate(selectedCount, "licencja", "licencje", "licencji")}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64">
-        <DropdownMenuLabel>Filtruj według kategorii</DropdownMenuLabel>
+        <DropdownMenuLabel>Filtruj według licencji</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
         {isLoading ? (
@@ -97,23 +83,18 @@ export function CategoryFilter({
                 }
               }}
             >
-              Wszystkie kategorie
+              Wszystkie licencje
             </DropdownMenuCheckboxItem>
             <DropdownMenuSeparator />
 
-            {categories?.map((category) => (
+            {licenses?.map((license) => (
               <DropdownMenuCheckboxItem
-                key={category.id}
-                checked={selectedCategories.includes(category.id)}
-                onCheckedChange={() => handleCategoryToggle(category.id)}
+                key={license.id}
+                checked={selectedLicenses.includes(license.id)}
+                onCheckedChange={() => handleLicenseToggle(license.id)}
                 className="flex items-center gap-2"
               >
-                <div
-                  className="h-3 w-3 shrink-0 rounded-full border"
-                  style={getStyle(category.color)}
-                />
-                {(showLicenseName ? category.license?.name + ": " : "") +
-                  category.name}
+                {license.name}
               </DropdownMenuCheckboxItem>
             ))}
           </>

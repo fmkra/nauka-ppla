@@ -43,6 +43,34 @@
       "when": 1752497563943,
       "tag": "0005_dapper_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1752523501719,
+      "tag": "0006_nasty_flatman",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1752588851523,
+      "tag": "0007_redundant_gambit",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1752591311878,
+      "tag": "0008_solid_blonde_phantom",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1752598071756,
+      "tag": "0009_optimal_taskmaster",
+      "breakpoints": true
     }
   ]
 }

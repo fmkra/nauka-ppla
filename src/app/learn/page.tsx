@@ -5,98 +5,51 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import * as icons from "lucide-react";
 import { db } from "~/server/db";
-import { categories, questions } from "~/server/db/schema";
-import { count, eq } from "drizzle-orm";
-import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/utils";
 import Link from "next/link";
 
 export default async function LearnPage() {
-  const cardsWithCounts = await db
-    .select({
-      id: categories.id,
-      name: categories.name,
-      url: categories.url,
-      description: categories.description,
-      questionCount: count(questions.id),
-    })
-    .from(categories)
-    .leftJoin(questions, eq(categories.id, questions.category))
-    .groupBy(categories.id)
-    .orderBy(categories.id);
+  const licenses = await db.query.licenses.findMany({
+    orderBy: (license, { asc }) => [asc(license.id)],
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold">Materiały do nauki PPL(A)</h1>
+        <h1 className="mb-4 text-3xl font-bold">Wybierz swój typ licencji</h1>
         <p className="text-muted-foreground">
           Kompleksowe materiały do przygotowania się do egzaminu teoretycznego
-          na licencję pilota prywatnego samolotu (PPL-A).
+          na licencję pilota prywatnego samolotu.
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {cardsWithCounts.map((card) => {
-          const [description, icon, ...topics] =
-            card.description?.split("\n") ?? [];
-          if (!icon) return null;
-          const Icon = icons[icon as keyof typeof icons] as React.ElementType;
-          const duration = formatTime(
-            card.questionCount * MINUTES_PER_QUESTION,
-          );
-
+        {licenses.map((license) => {
           return (
-            <Card key={card.id} className="transition-shadow hover:shadow-lg">
+            <Card
+              key={license.id}
+              className="transition-shadow hover:shadow-lg"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                      <Icon className="text-primary h-5 w-5" />
+                      {/* <Icon className="text-primary h-5 w-5" /> */}
                     </div>
                     <div>
-                      <CardTitle className="text-lg">{card.name}</CardTitle>
+                      <CardTitle className="text-lg">{license.name}</CardTitle>
                     </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent className="flex h-full flex-col">
                 <CardDescription className="mb-4 text-sm">
-                  {description}
+                  {license.description}
                 </CardDescription>
 
-                <div className="text-muted-foreground mb-4 flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <icons.Clock className="h-4 w-4" />
-                    {duration}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <icons.BookOpen className="h-4 w-4" />
-                    {card.questionCount}{" "}
-                    {conjugate(
-                      card.questionCount,
-                      "pytanie",
-                      "pytania",
-                      "pytań",
-                    )}
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <h4 className="mb-2 text-sm font-medium">Tematy:</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {topics.map((topic) => (
-                      <Badge key={topic} variant="outline" className="text-xs">
-                        {topic}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
                 <Button className="mt-auto w-full" asChild>
-                  <Link href={`/learn/${card.url}`}>Rozpocznij naukę</Link>
+                  <Link href={`/learn/${license.url}`}>Rozpocznij naukę</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -105,9 +58,7 @@ export default async function LearnPage() {
       </div>
 
       <div className="bg-muted/50 mt-12 rounded-lg p-6">
-        <h2 className="mb-4 text-xl font-semibold">
-          Informacje o egzaminie PPL(A)
-        </h2>
+        <h2 className="mb-4 text-xl font-semibold">Informacje o egzaminie</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <h3 className="mb-2 font-medium">Wymagania egzaminacyjne:</h3>
