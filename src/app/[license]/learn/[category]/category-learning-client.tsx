@@ -49,9 +49,49 @@ export function CategoryLearningClient({
     });
   const attempt = extendAttempt(_attempt);
 
+  const questionsPageSize = 10;
+  const questionsFetchWhenCloserThan = 3;
+  const questionsMaxFetchedPages = 2;
+  const { data, fetchNextPage, isFetchingNextPage } =
+    api.learning.getQuestions.useInfiniteQuery(
+      {
+        categoryId: category.id,
+        attemptNumber: typeof attempt === "object" ? attempt.currentAttempt : 0,
+        limit: questionsPageSize,
+      },
+      {
+        enabled: typeof attempt === "object" && attempt.notAnswered > 0,
+        initialCursor: typeof attempt === "object" ? attempt.questionNumber : 0,
+        maxPages: questionsMaxFetchedPages,
+        getNextPageParam: (_a, _b, lastPageParam) =>
+          lastPageParam + questionsPageSize,
+        select: (data) => {
+          let lastQuestionNumber = 0;
+          const pages = data.pages.flat();
+          const output = {} as Record<number, (typeof pages)[number]>;
+          for (const page of pages) {
+            output[page.questionNumber] = page;
+            if (page.questionNumber > lastQuestionNumber) {
+              lastQuestionNumber = page.questionNumber;
+            }
+          }
+          return { questions: output, lastQuestionNumber };
+        },
+      },
+    );
+
   const utils = api.useUtils();
 
   const nextQuestion = (isCorrect: boolean) => {
+    if (
+      data &&
+      typeof attempt === "object" &&
+      attempt.questionNumber + questionsFetchWhenCloserThan >=
+        data.lastQuestionNumber &&
+      !isFetchingNextPage
+    ) {
+      void fetchNextPage();
+    }
     utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
       if (typeof old !== "object") return old;
       return {
@@ -80,19 +120,13 @@ export function CategoryLearningClient({
     });
   };
 
-  const { data: question } = api.learning.getQuestion.useQuery(
-    {
-      categoryId: category.id,
-      attemptNumber: typeof attempt === "object" ? attempt.currentAttempt : 0,
-      questionNumber: typeof attempt === "object" ? attempt.questionNumber : 0,
-    },
-    {
-      enabled: typeof attempt === "object" && attempt.notAnswered > 0,
-    },
-  );
+  const question =
+    typeof attempt === "object"
+      ? data?.questions[attempt.questionNumber]
+      : undefined;
 
   const onLearningReset = async () => {
-    await utils.learning.getQuestion.reset();
+    await utils.learning.getQuestions.reset();
     await utils.learning.getAttempt.reset();
   };
 

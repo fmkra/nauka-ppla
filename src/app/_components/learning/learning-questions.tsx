@@ -9,7 +9,8 @@ import { cn, randomizeQuestion } from "~/lib/utils";
 import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 
-type Question = inferRouterOutputs<AppRouter>["learning"]["getQuestion"];
+type Question =
+  inferRouterOutputs<AppRouter>["learning"]["getQuestions"][number];
 
 export function LearningQuestions({
   attempt,
@@ -18,7 +19,7 @@ export function LearningQuestions({
   answerQuestion,
 }: {
   attempt: ExtendedAttempt;
-  question: Question;
+  question: Question | undefined;
   licenseId: number | null;
   answerQuestion: (isCorrect: boolean) => void;
 }) {
@@ -29,6 +30,7 @@ export function LearningQuestions({
       if (licenseId !== null) {
         await utils.learning.getLicenseProgress.invalidate({ licenseId });
       }
+      // TODO: optimistic update, probably don't move cache invalidation from here
       answerQuestion(isCorrect);
     },
   });
@@ -62,35 +64,35 @@ export function LearningQuestions({
           <LearningProgressBar attempt={attempt} />
         </CardHeader>
         <CardContent>
-          {!!parsedQuestion?.question && (
-            <p className="mb-4">
-              {!!parsedQuestion?.externalId && (
-                <span>{parsedQuestion.externalId}: </span>
-              )}
-              {parsedQuestion?.question}
-            </p>
-          )}
           <div className="mb-4 space-y-2">
             {parsedQuestion ? (
-              parsedQuestion.answers.map(([dbIndex, answer], index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelected(selected ?? dbIndex)}
-                  className={cn(
-                    `block w-full rounded-lg border p-3 text-left`,
-                    dbIndex === 0 && selected !== null
-                      ? "border-green-200 bg-green-50 text-green-800"
-                      : selected === dbIndex
-                        ? "border-red-200 bg-red-50 text-red-800"
-                        : "border-gray-200 bg-gray-50",
+              <>
+                <p className="mb-4">
+                  {!!parsedQuestion?.externalId && (
+                    <span>{parsedQuestion.externalId}: </span>
                   )}
-                >
-                  <span className="mr-2 font-medium">
-                    {String.fromCharCode(65 + index)}.
-                  </span>
-                  {answer}
-                </button>
-              ))
+                  {parsedQuestion?.question}
+                </p>
+                {parsedQuestion.answers.map(([dbIndex, answer], index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelected(selected ?? dbIndex)}
+                    className={cn(
+                      `block w-full rounded-lg border p-3 text-left`,
+                      dbIndex === 0 && selected !== null
+                        ? "border-green-200 bg-green-50 text-green-800"
+                        : selected === dbIndex
+                          ? "border-red-200 bg-red-50 text-red-800"
+                          : "border-gray-200 bg-gray-50",
+                    )}
+                  >
+                    <span className="mr-2 font-medium">
+                      {String.fromCharCode(65 + index)}.
+                    </span>
+                    {answer}
+                  </button>
+                ))}
+              </>
             ) : (
               <div className="flex flex-col gap-2">
                 <Skeleton className="h-4 w-full rounded-none" />

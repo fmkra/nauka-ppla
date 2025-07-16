@@ -150,12 +150,13 @@ export const learningRouter = createTRPCRouter({
         );
     }),
 
-  getQuestion: protectedProcedure
+  getQuestions: protectedProcedure
     .input(
       z.object({
         categoryId: z.number(),
         attemptNumber: z.number(),
-        questionNumber: z.number(),
+        limit: z.number().max(100),
+        cursor: z.number(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -177,10 +178,10 @@ export const learningRouter = createTRPCRouter({
           ),
         )
         .orderBy(asc(lp.random), asc(questions.externalId), asc(questions.id))
-        .limit(1)
-        .offset(input.questionNumber);
+        .limit(input.limit)
+        .offset(input.cursor);
 
-      return q[0];
+      return q.map((x, i) => ({ ...x, questionNumber: i + input.cursor }));
     }),
 
   answerQuestion: protectedProcedure
