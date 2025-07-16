@@ -22,8 +22,8 @@ interface CategoryLearningClientProps {
 
 type AttemptData = inferRouterOutputs<AppRouter>["learning"]["getAttempt"];
 
-export function extendAttempt(attempt: AttemptData | undefined | null) {
-  if (!attempt) return attempt;
+export function extendAttempt(attempt: AttemptData | undefined) {
+  if (typeof attempt !== "object") return attempt;
   return {
     ...attempt,
     questionNumber: attempt.answeredCorrectly + attempt.answeredIncorrectly,
@@ -36,7 +36,7 @@ export function extendAttempt(attempt: AttemptData | undefined | null) {
 
 export type ExtendedAttempt = Exclude<
   ReturnType<typeof extendAttempt>,
-  null | undefined
+  "UNAUTHORIZED" | "NO_ATTEMPT" | undefined
 >;
 
 export function CategoryLearningClient({
@@ -52,7 +52,7 @@ export function CategoryLearningClient({
 
   const nextQuestion = (isCorrect: boolean) => {
     utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
-      if (!old) return old;
+      if (typeof old !== "object") return old;
       return {
         ...old,
         answeredCorrectly: old.answeredCorrectly + (isCorrect ? 1 : 0),
@@ -65,8 +65,7 @@ export function CategoryLearningClient({
   const nextAttempt = () => {
     utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
       // Next attempt can only be started if there are questions left to answer
-      console.log("old", old);
-      if (!old || old.notAnswered !== 0) return old;
+      if (typeof old !== "object" || old.notAnswered !== 0) return old;
       return {
         ...old,
         currentAttempt: old.currentAttempt + 1,
@@ -83,11 +82,11 @@ export function CategoryLearningClient({
   const { data: question } = api.learning.getQuestion.useQuery(
     {
       categoryId: category.id,
-      attemptNumber: attempt?.currentAttempt ?? 0,
-      questionNumber: attempt?.questionNumber ?? 0,
+      attemptNumber: typeof attempt === "object" ? attempt.currentAttempt : 0,
+      questionNumber: typeof attempt === "object" ? attempt.questionNumber : 0,
     },
     {
-      enabled: !!attempt && attempt.notAnswered > 0,
+      enabled: typeof attempt === "object" && attempt.notAnswered > 0,
     },
   );
 
@@ -107,7 +106,7 @@ export function CategoryLearningClient({
     // TODO: handle error message
   }
 
-  if (!!attempt && attempt.notAnswered === 0) {
+  if (typeof attempt === "object" && attempt.notAnswered === 0) {
     if (attempt.answeredIncorrectly === 0)
       return (
         <LearningFinished
@@ -126,20 +125,27 @@ export function CategoryLearningClient({
       );
   }
 
-  if (attempt)
+  if (attempt === "UNAUTHORIZED")
     return (
-      <LearningQuestions
-        attempt={attempt}
-        question={question}
-        answerQuestion={nextQuestion}
+      <div className="flex flex-col items-center justify-center">
+        <h1 className="text-2xl font-bold">Zaloguj się aby kontynuować</h1>
+      </div>
+    );
+
+  if (attempt === "NO_ATTEMPT")
+    return (
+      <LearningBeginMenu
+        categoryId={category.id}
+        onLoadingBegin={() => setIsLoading(true)}
+        onLoaded={refetchAttempt}
       />
     );
 
   return (
-    <LearningBeginMenu
-      categoryId={category.id}
-      onLoadingBegin={() => setIsLoading(true)}
-      onLoaded={refetchAttempt}
+    <LearningQuestions
+      attempt={attempt}
+      question={question}
+      answerQuestion={nextQuestion}
     />
   );
 }

@@ -1,7 +1,11 @@
 import { z } from "zod";
 import { sql, and, eq, gte, asc } from "drizzle-orm";
 
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import {
+  createTRPCRouter,
+  protectedProcedure,
+  publicProcedure,
+} from "~/server/api/trpc";
 import { learningProgress as lp, learningCategory } from "~/server/db/learning";
 import { questionInstances, questions } from "~/server/db/question";
 
@@ -66,13 +70,16 @@ export const learningRouter = createTRPCRouter({
       `);
     }),
 
-  getAttempt: protectedProcedure
+  // Public so that we can handle unauthorized here
+  getAttempt: publicProcedure
     .input(
       z.object({
         categoryId: z.number(),
       }),
     )
     .query(async ({ ctx, input }) => {
+      if (!ctx.session?.user) return "UNAUTHORIZED";
+
       const attempt = (
         await ctx.db
           .select({
@@ -88,7 +95,7 @@ export const learningRouter = createTRPCRouter({
       )[0];
 
       if (attempt === undefined) {
-        return null;
+        return "NO_ATTEMPT";
       }
       const { currentAttempt } = attempt;
 

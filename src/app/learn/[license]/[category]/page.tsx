@@ -10,10 +10,9 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import * as icons from "lucide-react";
 import Link from "next/link";
-import { CategoryLearningClient } from "./category-learning-client";
 import { formatTime, MINUTES_PER_QUESTION } from "~/utils";
-import { auth } from "~/server/auth";
 import { getIcon } from "../../page";
+import { CategoryLearningClient } from "./category-learning-client";
 
 export default async function LearnCategoryPage({
   params,
@@ -21,7 +20,6 @@ export default async function LearnCategoryPage({
   params: Promise<{ category: string; license: string }>;
 }) {
   const { category: categoryUrl, license: licenseUrl } = await params;
-  const session = await auth();
 
   const categoryData = (
     await db
@@ -132,13 +130,7 @@ export default async function LearnCategoryPage({
       </div>
 
       <div className="flex min-h-[400px] items-center justify-center">
-        {session?.user ? (
-          <CategoryLearningClient category={categoryData} />
-        ) : (
-          <div className="flex flex-col items-center justify-center">
-            <h1 className="text-2xl font-bold">Zaloguj się aby kontynuować</h1>
-          </div>
-        )}
+        <CategoryLearningClient category={categoryData} />
       </div>
     </div>
   );
