@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import type { ExtendedAttempt } from "~/app/learn/[license]/[category]/category-learning-client";
+import type { ExtendedAttempt } from "~/app/[license]/learn/[category]/category-learning-client";
 import { api } from "~/trpc/react";
 
 export function LearningAttemptSummary({

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button, variants as buttonVariants } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/trpc/react";
-import { cn, conjugate } from "~/utils";
+import { cn, conjugate } from "~/lib/utils";
 
 type Category = {
   id: number;
@@ -46,7 +46,7 @@ export default function CardUserProgress({
         </p>
       ) : null}
       <Button className="mt-auto w-full" asChild>
-        <Link href={`/learn/${licenseUrl}/${category.url}`}>
+        <Link href={`/${licenseUrl}/learn/${category.url}`}>
           {categoryProgress ? "Kontynuuj naukę" : "Rozpocznij naukę"}
         </Link>
       </Button>

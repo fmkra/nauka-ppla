@@ -13,7 +13,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { api } from "~/trpc/react";
 import { Spinner } from "~/components/ui/spinner";
-import { conjugate } from "~/utils";
+import { conjugate } from "~/lib/utils";
 
 interface LicenseFilterProps {
   selectedLicenses: number[];

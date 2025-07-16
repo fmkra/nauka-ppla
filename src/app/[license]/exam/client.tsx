@@ -14,7 +14,7 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { Progress } from "~/components/ui/progress";
 import { Clock, CheckCircle, XCircle } from "lucide-react";
-import { randomizeQuestion } from "~/utils";
+import { randomizeQuestion } from "~/lib/utils";
 import { api } from "~/trpc/react";
 import { Spinner } from "~/components/ui/spinner";
 
@@ -39,10 +39,11 @@ const useTimer = (timeLength: number, beginTime_?: number) => {
   return timerString;
 };
 
-export default function ExamPage() {
+export default function ExamPageClient({ licenseId }: { licenseId: number }) {
   // TODO: use different endpoint
   const { data } = api.questionDatabase.getQuestions.useQuery({
     limit: 20,
+    licenseId,
     randomOrder: true,
   });
 

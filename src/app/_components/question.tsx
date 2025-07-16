@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { useMemo } from "react";
 import { Button } from "~/components/ui/button";
-import { randomizeQuestion, type QuestionBase } from "~/utils";
+import { randomizeQuestion, type QuestionBase } from "~/lib/utils";
 import { Info } from "lucide-react";
 import {
   Tooltip,

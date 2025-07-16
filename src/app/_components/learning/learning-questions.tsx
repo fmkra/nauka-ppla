@@ -4,8 +4,8 @@ import { LearningProgressBar } from "./progress-bar";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { ExtendedAttempt } from "~/app/learn/[license]/[category]/category-learning-client";
-import { cn, randomizeQuestion } from "~/utils";
+import type { ExtendedAttempt } from "~/app/[license]/learn/[category]/category-learning-client";
+import { cn, randomizeQuestion } from "~/lib/utils";
 import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 

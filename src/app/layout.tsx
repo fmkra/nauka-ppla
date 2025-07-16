@@ -5,7 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 
-import Navbar from "~/app/_components/navbar";
+import Navbar from "~/app/_components/navbar/navbar";
 import { SessionProvider } from "next-auth/react";
 
 // export const metadata: Metadata = {

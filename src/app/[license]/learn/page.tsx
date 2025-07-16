@@ -13,10 +13,10 @@ import { questionInstances } from "~/server/db/question";
 import { licenses } from "~/server/db/license";
 import { categories } from "~/server/db/category";
 import { count, eq } from "drizzle-orm";
-import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/utils";
+import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/lib/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getIcon } from "../page";
+import { getIcon } from "~/lib/get-icon";
 import CardUserProgress from "./user-progress";
 
 export default async function LearnPage({
@@ -55,7 +55,7 @@ export default async function LearnPage({
       <div className="mb-8">
         <div className="mb-4">
           <Button variant="outline" size="sm" asChild>
-            <Link href="/learn">
+            <Link href={`/${licenseUrl}`}>
               <icons.ArrowLeft className="mr-2 h-4 w-4" />
               Powrót do licencji
             </Link>

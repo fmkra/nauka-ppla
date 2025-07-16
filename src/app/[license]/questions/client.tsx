@@ -3,12 +3,12 @@
 import { Search } from "lucide-react";
 import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
-import { Question } from "../_components/question";
+import { Question } from "~/app/_components/question";
 import { Spinner } from "~/components/ui/spinner";
 import { useEffect, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type SelectOption } from "~/components/ui/select";
-import usePagination from "../_components/pagination";
+import usePagination from "~/app/_components/pagination";
 import { CategoryFilter } from "./category-filter";
 import { LicenseFilter } from "./license-filter";
 
@@ -20,10 +20,16 @@ const pageSizeOptions: SelectOption[] = [
   { value: "100", label: "100 pytań" },
 ];
 
-export default function QuestionsPage() {
+export default function QuestionsPageClient({
+  defaultLicenseId,
+}: {
+  defaultLicenseId: number;
+}) {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedLicenses, setSelectedLicenses] = useState<number[]>([]);
+  const [selectedLicenses, setSelectedLicenses] = useState<number[]>([
+    defaultLicenseId,
+  ]);
   const searchDebounced = useDebounce(search, 500);
 
   const { data: totalCount, isLoading: countLoading } =
@@ -52,14 +58,7 @@ export default function QuestionsPage() {
   const isLoading = questionsLoading || countLoading;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold">Baza pytań</h1>
-        <p className="text-muted-foreground">
-          Przeglądaj listę pytań i sprawdź czy umiesz na nie odpowiedzieć.
-        </p>
-      </div>
-
+    <>
       <div className="mb-6 flex gap-4">
         <div className="relative flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform" />
@@ -82,24 +81,20 @@ export default function QuestionsPage() {
         />
       </div>
 
-      {isLoading && (
+      {isLoading ? (
         <div className="flex min-h-[400px] items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <Spinner size="lg" />
             <p className="text-muted-foreground">Ładowanie...</p>
           </div>
         </div>
-      )}
-
-      {!isLoading && (!questions || questions.length === 0) && (
+      ) : !questions || questions.length === 0 ? (
         <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
             <p className="text-muted-foreground">Nie znaleziono pytań</p>
           </div>
         </div>
-      )}
-
-      {!isLoading && questions && questions.length > 0 && (
+      ) : (
         <>
           <div className="text-muted-foreground mb-4 flex items-center justify-between text-sm">
             <span>
@@ -116,6 +111,6 @@ export default function QuestionsPage() {
           {pagination.footer}
         </>
       )}
-    </div>
+    </>
   );
 }

@@ -10,8 +10,8 @@ import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import * as icons from "lucide-react";
 import Link from "next/link";
-import { formatTime, MINUTES_PER_QUESTION } from "~/utils";
-import { getIcon } from "../../page";
+import { formatTime, MINUTES_PER_QUESTION } from "~/lib/utils";
+import { getIcon } from "~/lib/get-icon";
 import { CategoryLearningClient } from "./category-learning-client";
 
 export default async function LearnCategoryPage({
@@ -53,7 +53,7 @@ export default async function LearnCategoryPage({
       <div className="mb-8">
         <div className="mb-4 flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>
-            <Link href={`/learn/${licenseUrl}`}>
+            <Link href={`/${licenseUrl}/learn`}>
               <icons.ArrowLeft className="mr-2 h-4 w-4" />
               Powrót do przedmiotów
             </Link>
