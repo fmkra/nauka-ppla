@@ -1,0 +1,1 @@
+ALTER TABLE "nauka-ppla_license" ADD COLUMN "icon" varchar(255);

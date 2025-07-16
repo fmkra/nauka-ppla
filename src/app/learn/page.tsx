@@ -8,6 +8,21 @@ import {
 import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
 import Link from "next/link";
+import * as LucideIcon from "lucide-react";
+import Image from "next/image";
+
+export function getIcon(icon: string | null | undefined): React.ReactNode {
+  if (!icon) return null;
+  if (icon.startsWith("lucide:")) {
+    const iconName = icon.slice(7) as keyof typeof LucideIcon;
+    const Icon = LucideIcon[iconName] as React.ElementType;
+    return <Icon className="text-primary h-5 w-5" />;
+  }
+  if (icon.startsWith("url:")) {
+    return <Image src={icon.slice(4)} alt={icon} fill className="rounded-lg" />;
+  }
+  return null;
+}
 
 export default async function LearnPage() {
   const licenses = await db.query.licenses.findMany({
@@ -26,6 +41,7 @@ export default async function LearnPage() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {licenses.map((license) => {
+          const icon = getIcon(license.icon);
           return (
             <Card
               key={license.id}
@@ -34,8 +50,8 @@ export default async function LearnPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                      {/* <Icon className="text-primary h-5 w-5" /> */}
+                    <div className="bg-primary/10 relative flex h-10 w-10 items-center justify-center rounded-lg">
+                      {icon}
                     </div>
                     <div>
                       <CardTitle className="text-lg">{license.name}</CardTitle>

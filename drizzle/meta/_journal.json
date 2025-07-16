@@ -71,6 +71,13 @@
       "when": 1752598071756,
       "tag": "0009_optimal_taskmaster",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1752665851369,
+      "tag": "0010_milky_jack_power",
+      "breakpoints": true
     }
   ]
 }

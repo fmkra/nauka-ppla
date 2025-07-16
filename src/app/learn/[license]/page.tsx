@@ -16,6 +16,7 @@ import { count, eq } from "drizzle-orm";
 import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getIcon } from "../page";
 
 export default async function LearnPage({
   params,
@@ -72,8 +73,6 @@ export default async function LearnPage({
         {cardsWithCounts.map((card) => {
           const [description, icon, ...topics] =
             card.description?.split("\n") ?? [];
-          if (!icon) return null;
-          const Icon = icons[icon as keyof typeof icons] as React.ElementType;
           const duration = formatTime(
             card.questionCount * MINUTES_PER_QUESTION,
           );
@@ -84,7 +83,7 @@ export default async function LearnPage({
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                      <Icon className="text-primary h-5 w-5" />
+                      {getIcon(icon)}
                     </div>
                     <div>
                       <CardTitle className="text-lg">{card.name}</CardTitle>
