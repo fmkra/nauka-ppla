@@ -11,16 +11,22 @@ import { Label } from "~/components/ui/label";
 import { api } from "~/trpc/react";
 
 export function LearningFinished({
+  licenseId,
   categoryId,
   onResetBegin: onLoadingBegin,
   onResetFinished: onLoaded,
 }: {
+  licenseId: number | null;
   categoryId: number;
   onResetBegin: () => void;
   onResetFinished: () => void;
 }) {
+  const utils = api.useUtils();
   const { mutate } = api.learning.resetLearningProgress.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      if (licenseId !== null) {
+        await utils.learning.getLicenseProgress.invalidate({ licenseId });
+      }
       onLoaded();
     },
   });

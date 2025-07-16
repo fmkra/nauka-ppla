@@ -51,7 +51,7 @@ export default async function LearnPage() {
                 </CardDescription>
 
                 <Button className="mt-auto w-full" asChild>
-                  <Link href={`/${license.url}`}>Rozpocznij naukę</Link>
+                  <Link href={`/${license.url}`}>Wybierz licencję</Link>
                 </Button>
               </CardContent>
             </Card>

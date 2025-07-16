@@ -17,6 +17,7 @@ interface CategoryLearningClientProps {
     url: string;
     description: string | null;
     questionCount: number;
+    licenseId: number | null;
   };
 }
 
@@ -110,6 +111,7 @@ export function CategoryLearningClient({
     if (attempt.answeredIncorrectly === 0)
       return (
         <LearningFinished
+          licenseId={category.licenseId}
           categoryId={category.id}
           onResetBegin={() => setIsLoading(true)}
           onResetFinished={onLearningReset}
@@ -135,6 +137,7 @@ export function CategoryLearningClient({
   if (attempt === "NO_ATTEMPT")
     return (
       <LearningBeginMenu
+        licenseId={category.licenseId}
         categoryId={category.id}
         onLoadingBegin={() => setIsLoading(true)}
         onLoaded={refetchAttempt}
@@ -143,6 +146,7 @@ export function CategoryLearningClient({
 
   return (
     <LearningQuestions
+      licenseId={category.licenseId}
       attempt={attempt}
       question={question}
       answerQuestion={nextQuestion}

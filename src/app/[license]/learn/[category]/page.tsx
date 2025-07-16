@@ -29,6 +29,7 @@ export default async function LearnCategoryPage({
         url: categories.url,
         description: categories.description,
         questionCount: count(questionInstances.id),
+        licenseId: categories.licenseId,
       })
       .from(categories)
       .leftJoin(

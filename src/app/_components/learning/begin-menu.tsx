@@ -15,16 +15,22 @@ import { Checkbox } from "~/components/ui/checkbox";
 import { Label } from "~/components/ui/label";
 
 export function LearningBeginMenu({
+  licenseId,
   categoryId,
   onLoaded,
   onLoadingBegin,
 }: {
+  licenseId: number | null;
   categoryId: number;
   onLoaded: () => void;
   onLoadingBegin: () => void;
 }) {
+  const utils = api.useUtils();
   const { mutate } = api.learning.resetLearningProgress.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      if (licenseId !== null) {
+        await utils.learning.getLicenseProgress.invalidate({ licenseId });
+      }
       onLoaded();
     },
   });

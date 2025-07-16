@@ -14,15 +14,21 @@ type Question = inferRouterOutputs<AppRouter>["learning"]["getQuestion"];
 export function LearningQuestions({
   attempt,
   question,
+  licenseId,
   answerQuestion,
 }: {
   attempt: ExtendedAttempt;
   question: Question;
+  licenseId: number | null;
   answerQuestion: (isCorrect: boolean) => void;
 }) {
+  const utils = api.useUtils();
   // TODO: after adding optimistic update, remove isPending
   const { mutate, isPending } = api.learning.answerQuestion.useMutation({
-    onSuccess: (_, { isCorrect }) => {
+    onSuccess: async (_, { isCorrect }) => {
+      if (licenseId !== null) {
+        await utils.learning.getLicenseProgress.invalidate({ licenseId });
+      }
       answerQuestion(isCorrect);
     },
   });
