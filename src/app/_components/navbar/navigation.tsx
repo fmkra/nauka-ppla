@@ -4,10 +4,10 @@ import { cn } from "~/lib/utils";
 import Link from "next/link";
 import { Select, type SelectOption } from "~/components/ui/select";
 import { usePathname, useRouter } from "next/navigation";
-import { BookOpen, Database, GraduationCap } from "lucide-react";
+import { BookOpen, Database, GraduationCap, Home } from "lucide-react";
 
 const navigation = [
-  // { name: "Start", href: "/", icon: Home },
+  { name: "Start", href: "", icon: Home },
   { name: "Nauka", href: "learn", icon: BookOpen },
   { name: "Baza pytań", href: "questions", icon: Database },
   { name: "Egzamin", href: "exam", icon: GraduationCap },
@@ -17,7 +17,7 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
   const pathname = usePathname().split("/");
   const router = useRouter();
   const license = pathname[1] === "" ? undefined : pathname[1];
-  const page = pathname[2];
+  const page = pathname[2] ?? "";
 
   const handleLicenseChange = (value: string) => {
     if (value === license) return;

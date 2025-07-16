@@ -53,14 +53,6 @@ export default async function LearnPage({
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <div className="mb-4">
-          <Button variant="outline" size="sm" asChild>
-            <Link href={`/${licenseUrl}`}>
-              <icons.ArrowLeft className="mr-2 h-4 w-4" />
-              Powrót do licencji
-            </Link>
-          </Button>
-        </div>
         <h1 className="mb-4 text-3xl font-bold">
           Materiały do nauki {licenseData.name}
         </h1>
