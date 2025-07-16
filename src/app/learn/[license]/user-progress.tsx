@@ -42,7 +42,7 @@ export default function CardUserProgress({
       {categoryProgress ? (
         <p className="text-muted-foreground mb-2 text-sm">
           Ukończono {categoryProgress.done} z {categoryProgress.total}{" "}
-          {conjugate(categoryProgress.done, "pytanie", "pytania", "pytań")}
+          {conjugate(categoryProgress.done, "pytania", "pytań", "pytań")}
         </p>
       ) : null}
       <Button className="mt-auto w-full" asChild>
