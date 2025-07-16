@@ -8,6 +8,7 @@ import {
 } from "~/server/api/trpc";
 import { learningProgress as lp, learningCategory } from "~/server/db/learning";
 import { questionInstances, questions } from "~/server/db/question";
+import { categories } from "~/server/db/category";
 
 export const learningRouter = createTRPCRouter({
   resetLearningProgress: protectedProcedure
@@ -203,5 +204,41 @@ export const learningRouter = createTRPCRouter({
             eq(lp.questionInstanceId, input.questionInstanceId),
           ),
         );
+    }),
+
+  getLicenseProgress: publicProcedure
+    .input(
+      z.object({
+        licenseId: z.number(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      if (!ctx.session?.user) return {};
+
+      const category = await ctx.db
+        .select({
+          categoryId: categories.id,
+          done: sql<number>`COUNT(*) FILTER (WHERE "isDone" = true)`,
+          total: sql<number>`COUNT(*)`,
+        })
+        .from(questionInstances)
+        .innerJoin(lp, eq(questionInstances.id, lp.questionInstanceId))
+        .innerJoin(categories, eq(questionInstances.categoryId, categories.id))
+        .where(
+          and(
+            eq(lp.userId, ctx.session.user.id),
+            eq(categories.licenseId, input.licenseId),
+          ),
+        )
+        .groupBy(categories.id);
+
+      const output: Record<number, { done: number; total: number }> = {};
+      for (const c of category) {
+        output[c.categoryId] = {
+          done: c.done,
+          total: c.total,
+        };
+      }
+      return output;
     }),
 });

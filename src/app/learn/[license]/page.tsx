@@ -17,6 +17,7 @@ import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/utils";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getIcon } from "../page";
+import CardUserProgress from "./user-progress";
 
 export default async function LearnPage({
   params,
@@ -124,11 +125,11 @@ export default async function LearnPage({
                   </div>
                 </div>
 
-                <Button className="mt-auto w-full" asChild>
-                  <Link href={`/learn/${licenseUrl}/${card.url}`}>
-                    Rozpocznij naukę
-                  </Link>
-                </Button>
+                <CardUserProgress
+                  licenseId={licenseData.id}
+                  licenseUrl={licenseUrl}
+                  category={card}
+                />
               </CardContent>
             </Card>
           );
