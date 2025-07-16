@@ -10,16 +10,27 @@ import { db } from "~/server/db";
 import Link from "next/link";
 import * as LucideIcon from "lucide-react";
 import Image from "next/image";
+import { cn } from "~/utils";
 
-export function getIcon(icon: string | null | undefined): React.ReactNode {
+export function getIcon(
+  icon: string | null | undefined,
+  className?: string,
+): React.ReactNode {
   if (!icon) return null;
   if (icon.startsWith("lucide:")) {
     const iconName = icon.slice(7) as keyof typeof LucideIcon;
     const Icon = LucideIcon[iconName] as React.ElementType;
-    return <Icon className="text-primary h-5 w-5" />;
+    return <Icon className={cn("text-primary h-5 w-5", className)} />;
   }
   if (icon.startsWith("url:")) {
-    return <Image src={icon.slice(4)} alt={icon} fill className="rounded-lg" />;
+    return (
+      <Image
+        src={icon.slice(4)}
+        alt={icon}
+        fill
+        className={cn("rounded-lg", className)}
+      />
+    );
   }
   return null;
 }
@@ -50,7 +61,7 @@ export default async function LearnPage() {
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 relative flex h-10 w-10 items-center justify-center rounded-lg">
+                    <div className="bg-primary/10 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
                       {icon}
                     </div>
                     <div>

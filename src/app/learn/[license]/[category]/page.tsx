@@ -13,6 +13,7 @@ import Link from "next/link";
 import { CategoryLearningClient } from "./category-learning-client";
 import { formatTime, MINUTES_PER_QUESTION } from "~/utils";
 import { auth } from "~/server/auth";
+import { getIcon } from "../../page";
 
 export default async function LearnCategoryPage({
   params,
@@ -48,8 +49,6 @@ export default async function LearnCategoryPage({
 
   const [description, icon, ...topics] =
     categoryData.description?.split("\n") ?? [];
-  if (!icon) return null;
-  const Icon = icons[icon as keyof typeof icons] as React.ElementType;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -66,7 +65,7 @@ export default async function LearnCategoryPage({
         <div className="flex items-start justify-between">
           <div>
             <h1 className="mb-2 flex items-center text-3xl font-bold">
-              <Icon className="mr-2 h-6 w-6" />
+              {getIcon(icon, "mr-2 h-6 w-6")}
               {categoryData.name}
             </h1>
             <p className="text-muted-foreground mb-4 max-w-2xl">
