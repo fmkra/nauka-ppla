@@ -13,11 +13,13 @@ import { api } from "~/trpc/react";
 export function LearningFinished({
   licenseId,
   categoryId,
+  isAnswerQuestionPending,
   onResetBegin: onLoadingBegin,
   onResetFinished: onLoaded,
 }: {
   licenseId: number | null;
   categoryId: number;
+  isAnswerQuestionPending: boolean;
   onResetBegin: () => void;
   onResetFinished: () => void;
 }) {
@@ -40,6 +42,8 @@ export function LearningFinished({
 
   // TODO: review questions
 
+  // TODO: Button should not only be disabled, but show spinner
+
   return (
     <Card className="mx-auto w-full max-w-2xl">
       <CardHeader className="text-center">
@@ -53,7 +57,7 @@ export function LearningFinished({
             />
             <Label htmlFor="isRandom">Losowa kolejność pytań</Label>
           </div>
-          <Button onClick={startNewAttempt}>
+          <Button disabled={isAnswerQuestionPending} onClick={startNewAttempt}>
             Zresetuj postęp i zacznij od nowa
           </Button>
         </CardDescription>

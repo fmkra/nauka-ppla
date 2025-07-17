@@ -4,10 +4,15 @@ import { LearningProgressBar } from "./progress-bar";
 import { api } from "~/trpc/react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { ExtendedAttempt } from "~/app/[license]/learn/[category]/category-learning-client";
+import type {
+  AnswerQuestionInput,
+  ExtendedAttempt,
+} from "~/app/[license]/learn/[category]/category-learning-client";
 import { cn, randomizeQuestion } from "~/lib/utils";
 import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
+import { Spinner } from "~/components/ui/spinner";
+import { useNotification } from "../notifications";
 
 type Question =
   inferRouterOutputs<AppRouter>["learning"]["getQuestions"][number];
@@ -15,26 +20,14 @@ type Question =
 export function LearningQuestions({
   attempt,
   question,
-  licenseId,
+  isAnswerQuestionPending,
   answerQuestion,
 }: {
   attempt: ExtendedAttempt;
   question: Question | undefined;
-  licenseId: number | null;
-  answerQuestion: (isCorrect: boolean) => void;
+  isAnswerQuestionPending: boolean;
+  answerQuestion: (data: AnswerQuestionInput) => void;
 }) {
-  const utils = api.useUtils();
-  // TODO: after adding optimistic update, remove isPending
-  const { mutate, isPending } = api.learning.answerQuestion.useMutation({
-    onSuccess: async (_, { isCorrect }) => {
-      if (licenseId !== null) {
-        await utils.learning.getLicenseProgress.invalidate({ licenseId });
-      }
-      // TODO: optimistic update, probably don't move cache invalidation from here
-      answerQuestion(isCorrect);
-    },
-  });
-
   const parsedQuestion = useMemo(() => {
     // TODO: randomness based on data from db (random and latestAttempt)
     if (!question) return null;
@@ -45,7 +38,7 @@ export function LearningQuestions({
 
   const next = () => {
     if (!parsedQuestion || !question) return;
-    mutate({
+    answerQuestion({
       questionInstanceId: question.question_instance.id,
       attemptNumber: attempt.currentAttempt,
       isCorrect: selected === 0,
@@ -105,8 +98,16 @@ export function LearningQuestions({
             )}
           </div>
           <div className="flex w-full justify-end">
-            <Button disabled={isPending || selected === null} onClick={next}>
-              Dalej
+            <Button
+              disabled={isAnswerQuestionPending || selected === null}
+              onClick={next}
+              className="w-20"
+            >
+              {isAnswerQuestionPending && selected !== null ? (
+                <Spinner size="sm" />
+              ) : (
+                "Dalej"
+              )}
             </Button>
           </div>
         </CardContent>

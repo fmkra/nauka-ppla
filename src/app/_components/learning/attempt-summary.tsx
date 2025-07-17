@@ -12,15 +12,18 @@ import { api } from "~/trpc/react";
 export function LearningAttemptSummary({
   attempt,
   categoryId,
+  isAnswerQuestionPending,
   nextAttempt,
 }: {
   attempt: ExtendedAttempt;
   categoryId: number;
   nextAttempt: () => void;
+  // Whether mutation that sends question answers is still in progress.
+  // In that case, user shouldn't be able to take any action.
+  isAnswerQuestionPending: boolean;
 }) {
   const { mutate } = api.learning.nextAttempt.useMutation({
     onSuccess: () => {
-      console.log("calling nextAttempt");
       nextAttempt();
     },
   });
@@ -28,6 +31,8 @@ export function LearningAttemptSummary({
   const startNextAttempt = () => {
     mutate({ categoryId });
   };
+
+  // TODO: Button should not only be disabled, but show spinner
 
   return (
     <Card className="mx-auto w-full max-w-4xl">
@@ -50,7 +55,9 @@ export function LearningAttemptSummary({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <Button onClick={startNextAttempt}>Rozpocznij kolejne podejście</Button>
+        <Button disabled={isAnswerQuestionPending} onClick={startNextAttempt}>
+          Rozpocznij kolejne podejście
+        </Button>
       </CardContent>
     </Card>
   );

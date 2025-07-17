@@ -9,6 +9,7 @@ import { LearningAttemptSummary } from "~/app/_components/learning/attempt-summa
 import { LearningFinished } from "~/app/_components/learning/learning-finished";
 import type { AppRouter } from "~/server/api/root";
 import type { inferRouterOutputs } from "@trpc/server";
+import { useNotification } from "~/app/_components/notifications";
 
 interface CategoryLearningClientProps {
   category: {
@@ -25,13 +26,14 @@ type AttemptData = inferRouterOutputs<AppRouter>["learning"]["getAttempt"];
 
 export function extendAttempt(attempt: AttemptData | undefined) {
   if (typeof attempt !== "object") return attempt;
+  const answeredThisAttempt =
+    attempt.answeredCorrectly + attempt.answeredIncorrectly;
+  const totalThisAttempt = answeredThisAttempt + attempt.notAnswered;
   return {
     ...attempt,
-    questionNumber: attempt.answeredCorrectly + attempt.answeredIncorrectly,
-    attemptQuestionCount:
-      attempt.answeredCorrectly +
-      attempt.answeredIncorrectly +
-      attempt.notAnswered,
+    questionNumber: answeredThisAttempt,
+    attemptQuestionCount: totalThisAttempt,
+    totalQuestionCount: totalThisAttempt + attempt.previouslyAnswered,
   };
 }
 
@@ -39,6 +41,12 @@ export type ExtendedAttempt = Exclude<
   ReturnType<typeof extendAttempt>,
   "UNAUTHORIZED" | "NO_ATTEMPT" | undefined
 >;
+
+export type AnswerQuestionInput = {
+  questionInstanceId: string;
+  attemptNumber: number;
+  isCorrect: boolean;
+};
 
 export function CategoryLearningClient({
   category,
@@ -49,9 +57,9 @@ export function CategoryLearningClient({
     });
   const attempt = extendAttempt(_attempt);
 
-  const questionsPageSize = 10;
-  const questionsFetchWhenCloserThan = 3;
-  const questionsMaxFetchedPages = 2;
+  const questionsPageSize = 20;
+  const questionsFetchWhenCloserThan = 4;
+  const questionsMaxFetchedPages = 3;
   const { data, fetchNextPage, isFetchingNextPage } =
     api.learning.getQuestions.useInfiniteQuery(
       {
@@ -63,8 +71,12 @@ export function CategoryLearningClient({
         enabled: typeof attempt === "object" && attempt.notAnswered > 0,
         initialCursor: typeof attempt === "object" ? attempt.questionNumber : 0,
         maxPages: questionsMaxFetchedPages,
-        getNextPageParam: (_a, _b, lastPageParam) =>
-          lastPageParam ?? 0 + questionsPageSize,
+        getNextPageParam: (_a, _b, lastPageParam) => {
+          if (typeof attempt !== "object") return undefined;
+          const nextPageBegin = (lastPageParam ?? 0) + questionsPageSize;
+          if (nextPageBegin >= attempt.totalQuestionCount) return undefined;
+          return nextPageBegin;
+        },
         select: (data) => {
           let lastQuestionNumber = 0;
           const pages = data.pages.flat();
@@ -103,6 +115,18 @@ export function CategoryLearningClient({
     });
   };
 
+  const restoreQuestion = (answer: boolean) => {
+    utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
+      if (typeof old !== "object") return old;
+      return {
+        ...old,
+        answeredCorrectly: old.answeredCorrectly - (answer ? 1 : 0),
+        answeredIncorrectly: old.answeredIncorrectly - (answer ? 0 : 1),
+        notAnswered: old.notAnswered + 1,
+      };
+    });
+  };
+
   const nextAttempt = () => {
     utils.learning.getAttempt.setData({ categoryId: category.id }, (old) => {
       // Next attempt can only be started if there are questions left to answer
@@ -130,6 +154,37 @@ export function CategoryLearningClient({
     await utils.learning.getAttempt.reset();
   };
 
+  const { notify } = useNotification();
+
+  const { mutate: mutateAnswerQuestion, isPending: isAnswerQuestionPending } =
+    api.learning.answerQuestion.useMutation({
+      onSuccess: async () => {
+        if (category.licenseId !== null) {
+          await utils.learning.getLicenseProgress.invalidate({
+            licenseId: category.licenseId,
+          });
+        }
+      },
+      onError: (error, { isCorrect }) => {
+        notify({
+          type: "error",
+          title: "Błąd wysyłania odpowiedzi",
+          description: (
+            <>
+              <p>Spróbuj przejść dalej ponownie</p>
+              <p>{error.message}</p>
+            </>
+          ),
+        });
+        restoreQuestion(isCorrect);
+      },
+    });
+
+  const answerQuestion = (data: AnswerQuestionInput) => {
+    nextQuestion(data.isCorrect);
+    mutateAnswerQuestion(data);
+  };
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -147,6 +202,7 @@ export function CategoryLearningClient({
         <LearningFinished
           licenseId={category.licenseId}
           categoryId={category.id}
+          isAnswerQuestionPending={isAnswerQuestionPending}
           onResetBegin={() => setIsLoading(true)}
           onResetFinished={onLearningReset}
         />
@@ -156,6 +212,7 @@ export function CategoryLearningClient({
         <LearningAttemptSummary
           attempt={attempt}
           categoryId={category.id}
+          isAnswerQuestionPending={isAnswerQuestionPending}
           nextAttempt={nextAttempt}
         />
       );
@@ -180,10 +237,10 @@ export function CategoryLearningClient({
 
   return (
     <LearningQuestions
-      licenseId={category.licenseId}
       attempt={attempt}
       question={question}
-      answerQuestion={nextQuestion}
+      isAnswerQuestionPending={isAnswerQuestionPending}
+      answerQuestion={answerQuestion}
     />
   );
 }
