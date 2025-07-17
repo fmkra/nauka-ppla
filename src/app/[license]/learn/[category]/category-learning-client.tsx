@@ -64,7 +64,7 @@ export function CategoryLearningClient({
         initialCursor: typeof attempt === "object" ? attempt.questionNumber : 0,
         maxPages: questionsMaxFetchedPages,
         getNextPageParam: (_a, _b, lastPageParam) =>
-          lastPageParam + questionsPageSize,
+          lastPageParam ?? 0 + questionsPageSize,
         select: (data) => {
           let lastQuestionNumber = 0;
           const pages = data.pages.flat();
