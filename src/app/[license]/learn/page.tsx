@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
 import * as icons from "lucide-react";
 import { db } from "~/server/db";
 import { questionInstances } from "~/server/db/question";
@@ -14,7 +13,6 @@ import { licenses } from "~/server/db/license";
 import { categories } from "~/server/db/category";
 import { count, eq } from "drizzle-orm";
 import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/lib/utils";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getIcon } from "~/lib/get-icon";
 import CardUserProgress from "./user-progress";

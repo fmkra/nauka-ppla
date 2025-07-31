@@ -1,0 +1,1 @@
+ALTER TABLE "nauka-ppla_exam_attempt" DROP CONSTRAINT "nauka-ppla_exam_attempt_userId_categoryId_unique";

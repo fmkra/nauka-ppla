@@ -1,0 +1,1 @@
+ALTER TABLE "nauka-ppla_exam_attempt" ADD COLUMN "deadlineTime" timestamp NOT NULL;

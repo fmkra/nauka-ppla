@@ -9,6 +9,7 @@ import * as tag from "./tag";
 import * as learning from "./learning";
 import * as category from "./category";
 import * as license from "./license";
+import * as exam from "./exam";
 import { createTable } from "./creator";
 
 /**
@@ -31,5 +32,6 @@ export const db = drizzle(conn, {
     ...learning,
     ...category,
     ...license,
+    ...exam,
   },
 });

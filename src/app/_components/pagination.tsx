@@ -13,6 +13,7 @@ export default function usePagination(
   pageSizes: SelectOption[],
   defaultPageSize: string,
   totalCount: number | undefined,
+  showWhenSinglePage = false,
 ) {
   const [pageSize, setPageSize] = useState(defaultPageSize);
   const [currentPage, setCurrentPage] = useState(1);
@@ -76,71 +77,69 @@ export default function usePagination(
   const currentPageRange = `${offset + 1}-${Math.min(offset + limit, totalCount ?? 0)}`;
 
   const footer =
-    totalPages > 1 ? (
-      <div className="mt-8">
-        <Pagination>
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage > 1) {
-                    handlePageChange(currentPage - 1);
-                  }
-                }}
-                className={
-                  currentPage <= 1
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
+    totalPages > 1 || showWhenSinglePage ? (
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (currentPage > 1) {
+                  handlePageChange(currentPage - 1);
                 }
-              />
-            </PaginationItem>
+              }}
+              className={
+                currentPage <= 1
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer"
+              }
+            />
+          </PaginationItem>
 
-            {getPageNumbers().map((page, index, array) => (
-              <Fragment key={page}>
-                {index > 0 && array[index - 1] !== page - 1 && (
-                  <PaginationItem>
-                    <span className="flex h-9 w-9 items-center justify-center text-sm">
-                      ...
-                    </span>
-                  </PaginationItem>
-                )}
+          {getPageNumbers().map((page, index, array) => (
+            <Fragment key={page}>
+              {index > 0 && array[index - 1] !== page - 1 && (
                 <PaginationItem>
-                  <PaginationLink
-                    href="#"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePageChange(page);
-                    }}
-                    isActive={currentPage === page}
-                    className="cursor-pointer"
-                  >
-                    {page}
-                  </PaginationLink>
+                  <span className="flex h-9 w-9 items-center justify-center text-sm">
+                    ...
+                  </span>
                 </PaginationItem>
-              </Fragment>
-            ))}
+              )}
+              <PaginationItem>
+                <PaginationLink
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePageChange(page);
+                  }}
+                  isActive={currentPage === page}
+                  className="cursor-pointer"
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            </Fragment>
+          ))}
 
-            <PaginationItem>
-              <PaginationNext
-                href="#"
-                onClick={(e) => {
-                  e.preventDefault();
-                  if (currentPage < totalPages) {
-                    handlePageChange(currentPage + 1);
-                  }
-                }}
-                className={
-                  currentPage >= totalPages
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
+          <PaginationItem>
+            <PaginationNext
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (currentPage < totalPages) {
+                  handlePageChange(currentPage + 1);
                 }
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
-      </div>
+              }}
+              className={
+                currentPage >= totalPages
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer"
+              }
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     ) : null;
 
   return {

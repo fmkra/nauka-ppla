@@ -78,6 +78,34 @@
       "when": 1752665851369,
       "tag": "0010_milky_jack_power",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1752847577378,
+      "tag": "0011_majestic_rocket_raccoon",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1752852508279,
+      "tag": "0012_blue_punisher",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1752875367969,
+      "tag": "0013_absurd_bulldozer",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1753019252644,
+      "tag": "0014_grey_roxanne_simpson",
+      "breakpoints": true
     }
   ]
 }
