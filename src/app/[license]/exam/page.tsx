@@ -31,3 +31,7 @@ export default async function ExamsPage({
     </div>
   );
 }
+
+export function generateStaticParams() {
+  return db.select({ license: licenses.url }).from(licenses);
+}
