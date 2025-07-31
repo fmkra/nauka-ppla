@@ -37,6 +37,8 @@ export default async function LearnPage({
       name: categories.name,
       url: categories.url,
       description: categories.description,
+      icon: categories.icon,
+      topics: categories.topics,
       questionCount: count(questionInstances.id),
     })
     .from(categories)
@@ -61,69 +63,56 @@ export default async function LearnPage({
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {cardsWithCounts.map((card) => {
-          const [description, icon, ...topics] =
-            card.description?.split("\n") ?? [];
-          const duration = formatTime(
-            card.questionCount * MINUTES_PER_QUESTION,
-          );
-
-          return (
-            <Card key={card.id} className="transition-shadow hover:shadow-lg">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                      {getIcon(icon)}
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">{card.name}</CardTitle>
-                    </div>
+        {cardsWithCounts.map((card) => (
+          <Card key={card.id} className="transition-shadow hover:shadow-lg">
+            <CardHeader>
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="bg-primary/10 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                    {getIcon(card.icon)}
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg">{card.name}</CardTitle>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="flex h-full flex-col">
-                <CardDescription className="mb-4 text-sm">
-                  {description}
-                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent className="flex h-full flex-col">
+              <CardDescription className="mb-4 text-sm">
+                {card.description}
+              </CardDescription>
 
-                <div className="text-muted-foreground mb-4 flex items-center gap-4 text-sm">
-                  <div className="flex items-center gap-1">
-                    <icons.Clock className="h-4 w-4" />
-                    {duration}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <icons.BookOpen className="h-4 w-4" />
-                    {card.questionCount}{" "}
-                    {conjugate(
-                      card.questionCount,
-                      "pytanie",
-                      "pytania",
-                      "pytań",
-                    )}
-                  </div>
+              <div className="text-muted-foreground mb-4 flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-1">
+                  <icons.Clock className="h-4 w-4" />
+                  {formatTime(card.questionCount * MINUTES_PER_QUESTION)}
                 </div>
-
-                <div className="mb-4">
-                  <h4 className="mb-2 text-sm font-medium">Tematy:</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {topics.map((topic) => (
-                      <Badge key={topic} variant="outline" className="text-xs">
-                        {topic}
-                      </Badge>
-                    ))}
-                  </div>
+                <div className="flex items-center gap-1">
+                  <icons.BookOpen className="h-4 w-4" />
+                  {card.questionCount}{" "}
+                  {conjugate(card.questionCount, "pytanie", "pytania", "pytań")}
                 </div>
+              </div>
 
-                <CardUserProgress
-                  licenseId={licenseData.id}
-                  licenseUrl={licenseUrl}
-                  category={card}
-                />
-              </CardContent>
-            </Card>
-          );
-        })}
+              <div className="mb-4">
+                <h4 className="mb-2 text-sm font-medium">Tematy:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {card.topics?.map((topic) => (
+                    <Badge key={topic} variant="outline" className="text-xs">
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+
+              <CardUserProgress
+                licenseId={licenseData.id}
+                licenseUrl={licenseUrl}
+                category={card}
+              />
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
       <div className="bg-muted/50 mt-12 rounded-lg p-6">

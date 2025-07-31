@@ -24,8 +24,8 @@ export default async function ExamStart({ licenseId }: { licenseId: number }) {
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                    {getIcon(category.description?.split("\n")[1] ?? "")}
+                  <div className="bg-primary/10 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                    {getIcon(category.icon)}
                   </div>
                   <div>
                     <CardTitle className="text-lg">{category.name}</CardTitle>

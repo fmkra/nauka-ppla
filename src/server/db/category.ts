@@ -11,7 +11,9 @@ export const categories = createTable(
     name: d.varchar({ length: 255 }).notNull(),
     url: d.varchar({ length: 255 }).notNull(),
     color: d.varchar({ length: 15 }),
+    icon: d.varchar({ length: 255 }),
     description: d.text(),
+    topics: d.text().array(),
     examTime: d.integer().notNull(), // in seconds
     examQuestionCount: d.integer().notNull(),
     licenseId: d.integer().references(() => licenses.id),

@@ -28,6 +28,8 @@ export default async function LearnCategoryPage({
         name: categories.name,
         url: categories.url,
         description: categories.description,
+        icon: categories.icon,
+        topics: categories.topics,
         questionCount: count(questionInstances.id),
         licenseId: categories.licenseId,
       })
@@ -46,9 +48,6 @@ export default async function LearnCategoryPage({
     notFound();
   }
 
-  const [description, icon, ...topics] =
-    categoryData.description?.split("\n") ?? [];
-
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
@@ -64,16 +63,16 @@ export default async function LearnCategoryPage({
         <div className="flex items-start justify-between">
           <div>
             <h1 className="mb-2 flex items-center text-3xl font-bold">
-              {getIcon(icon, "mr-2 h-6 w-6")}
+              {getIcon(categoryData.icon, "mr-2 h-6 w-6")}
               {categoryData.name}
             </h1>
             <p className="text-muted-foreground mb-4 max-w-2xl">
-              {description}
+              {categoryData.description}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
-            {topics.map((topic) => (
+            {categoryData.topics?.map((topic) => (
               <Badge key={topic} variant="secondary" className="text-sm">
                 {topic}
               </Badge>
