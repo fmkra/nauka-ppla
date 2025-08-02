@@ -70,7 +70,7 @@ export default function ExamList({ licenseId }: { licenseId: number }) {
     offset: pagination.offset,
   });
 
-  if (totalCount === null || !exams) {
+  if (totalCount === null || exams === null || exams?.length === 0) {
     return (
       <div className="container mx-auto py-8">
         <Card>
@@ -111,7 +111,7 @@ export default function ExamList({ licenseId }: { licenseId: number }) {
                 </tr>
               </thead>
               <tbody>
-                {exams.map((exam) => {
+                {exams?.map((exam) => {
                   const status = getStatus(
                     exam.finishedAt,
                     exam.answersCorrect,
