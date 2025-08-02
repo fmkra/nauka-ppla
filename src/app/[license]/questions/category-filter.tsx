@@ -11,9 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { api } from "~/trpc/react";
-import { Spinner } from "~/components/ui/spinner";
+// import { api } from "~/trpc/react";
+// import { Spinner } from "~/components/ui/spinner";
 import { conjugate } from "~/lib/utils";
+import type { Category } from "./client";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -25,22 +26,24 @@ function getStyle(color: string | null) {
 }
 
 interface CategoryFilterProps {
-  licenseIds: number[];
+  // licenseIds: number[];
+  categories: Category[];
   selectedCategories: number[];
   onCategoriesChange: (categories: number[]) => void;
 }
 
 export function CategoryFilter({
-  licenseIds,
+  // licenseIds,
+  categories,
   selectedCategories,
   onCategoriesChange,
 }: CategoryFilterProps) {
   const [open, setOpen] = useState(false);
 
-  const { data: categories, isLoading } =
-    api.questionDatabase.getCategories.useQuery({
-      licenseIds,
-    });
+  // const { data: categories, isLoading } =
+  //   api.questionDatabase.getCategories.useQuery({
+  //     licenseIds,
+  //   });
 
   const handleCategoryToggle = (categoryId: number) => {
     const newSelected = selectedCategories.includes(categoryId)
@@ -61,7 +64,7 @@ export function CategoryFilter({
 
   const selectedCount = selectedCategories.length;
   const totalCount = categories?.length ?? 0;
-  const showLicenseName = licenseIds.length !== 1;
+  // const showLicenseName = licenseIds.length !== 1;
 
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
@@ -69,55 +72,61 @@ export function CategoryFilter({
         <Button variant="outline" className="justify-between">
           <span>
             {selectedCount == 0 || selectedCount == totalCount
-              ? "Wszystkie kategorie"
+              ? "Wszystkie przedmioty"
               : selectedCount +
                 " " +
-                conjugate(selectedCount, "kategoria", "kategorie", "kategorii")}
+                conjugate(
+                  selectedCount,
+                  "przedmiot",
+                  "przedmioty",
+                  "przedmiotów",
+                )}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-64">
-        <DropdownMenuLabel>Filtruj według kategorii</DropdownMenuLabel>
+        <DropdownMenuLabel>Filtruj według przedmiotów</DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        {isLoading ? (
+        {/* {isLoading ? (
           <div className="flex items-center justify-center p-4">
             <Spinner size="sm" />
           </div>
         ) : (
-          <>
-            <DropdownMenuCheckboxItem
-              checked={selectedCount === totalCount}
-              onCheckedChange={() => {
-                if (selectedCount === totalCount) {
-                  handleClearAll();
-                } else {
-                  handleSelectAll();
-                }
-              }}
-            >
-              Wszystkie kategorie
-            </DropdownMenuCheckboxItem>
-            <DropdownMenuSeparator />
+          <> */}
+        <DropdownMenuCheckboxItem
+          checked={selectedCount === totalCount}
+          onCheckedChange={() => {
+            if (selectedCount === totalCount) {
+              handleClearAll();
+            } else {
+              handleSelectAll();
+            }
+          }}
+        >
+          Wszystkie przedmioty
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuSeparator />
 
-            {categories?.map((category) => (
-              <DropdownMenuCheckboxItem
-                key={category.id}
-                checked={selectedCategories.includes(category.id)}
-                onCheckedChange={() => handleCategoryToggle(category.id)}
-                className="flex items-center gap-2"
-              >
-                <div
-                  className="h-3 w-3 shrink-0 rounded-full border"
-                  style={getStyle(category.color)}
-                />
-                {(showLicenseName ? category.license?.name + ": " : "") +
-                  category.name}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </>
-        )}
+        {categories?.map((category) => (
+          <DropdownMenuCheckboxItem
+            key={category.id}
+            checked={selectedCategories.includes(category.id)}
+            onCheckedChange={() => handleCategoryToggle(category.id)}
+            className="flex items-center gap-2"
+          >
+            <div
+              className="h-3 w-3 shrink-0 rounded-full border"
+              style={getStyle(category.color)}
+            />
+            {/* {(showLicenseName ? category.license?.name + ": " : "") +
+              category.name} */}
+            {category.name}
+          </DropdownMenuCheckboxItem>
+        ))}
+        {/* </>
+        )} */}
       </DropdownMenuContent>
     </DropdownMenu>
   );

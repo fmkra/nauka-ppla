@@ -1,25 +1,32 @@
-import { db } from "~/server/db";
-import QuestionsPageClient from "./client";
-import { licenses } from "~/server/db/license";
-import { asc, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import QuestionsPageClient from "./client";
+import { db } from "~/server/db";
 
 export default async function QuestionsPage({
   params,
 }: {
   params: Promise<{ license: string }>;
 }) {
-  const { license } = await params;
-  const licenseList = await db
-    .select()
-    .from(licenses)
-    .where(eq(licenses.url, license))
-    .orderBy(asc(licenses.id))
-    .limit(1);
+  const { license: licenseUrl } = await params;
+  const license = await db.query.licenses.findFirst({
+    columns: {
+      id: true,
+    },
+    where: (licenses, { eq }) => eq(licenses.url, licenseUrl),
+  });
 
-  if (!licenseList[0]) {
+  if (!license) {
     notFound();
   }
+
+  const categoryList = await db.query.categories.findMany({
+    columns: {
+      id: true,
+      name: true,
+      color: true,
+    },
+    where: (categories, { eq }) => eq(categories.licenseId, license.id),
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -30,13 +37,17 @@ export default async function QuestionsPage({
         </p>
       </div>
 
-      <QuestionsPageClient defaultLicenseId={licenseList[0].id} />
+      <QuestionsPageClient categories={categoryList} />
     </div>
   );
 }
 
 export async function generateStaticParams() {
-  const licensesData = await db.select().from(licenses);
+  const licensesData = await db.query.licenses.findMany({
+    columns: {
+      url: true,
+    },
+  });
   return licensesData.map((license) => ({
     license: license.url,
   }));

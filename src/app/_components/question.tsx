@@ -13,9 +13,10 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useAnswerStore } from "~/stores";
-import type { CategoryAgg } from "~/server/api/routers/question_database";
+import type { Category } from "../[license]/questions/client";
+// import type { CategoryAgg } from "~/server/api/routers/question_database";
 
-function getStyle(color: string | null) {
+function getStyle(color: string | null | undefined) {
   const colors = color?.split(",");
   if (colors?.length != 2) return {};
   return {
@@ -24,19 +25,23 @@ function getStyle(color: string | null) {
   };
 }
 
-type QuestionArg = {
-  question: QuestionBase;
-  categories: CategoryAgg[];
-};
+// TODO: when we add question database page with all licenses, we can add this param back and use getQuestionsWithAllCategories instead of getQuestions
+// type QuestionArg = {
+//   question: QuestionBase;
+//   categories: CategoryAgg[];
+// };
 
 export function Question({
   question: q,
-  showLicense,
+  category,
+  // showLicense,
 }: {
-  question: QuestionArg;
-  showLicense: boolean;
+  // question: QuestionArg;
+  question: QuestionBase;
+  category: Category;
+  // showLicense: boolean;
 }) {
-  const question = useMemo(() => randomizeQuestion(q.question), [q]);
+  const question = useMemo(() => randomizeQuestion(q), [q]);
 
   const { answerState } = useAnswerStore();
   // `selected` is NOT index of displayed items but index in database (before shuffling)
@@ -82,7 +87,8 @@ export function Question({
             {/* {question.tags?.map((tag) => (
               <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
             ))} */}
-            {q.categories.map((category) => (
+            {/* TODO: this works good for multiple licenses page */}
+            {/* {q.categories.map((category) => (
               <Badge
                 variant="secondary"
                 style={getStyle(category.color)}
@@ -91,7 +97,10 @@ export function Question({
                 {(showLicense ? category.license.name + ": " : "") +
                   category.name}
               </Badge>
-            ))}
+            ))} */}
+            <Badge variant="secondary" style={getStyle(category.color)}>
+              {category.name}
+            </Badge>
             {question.externalId && (
               <TooltipProvider>
                 <Tooltip>

@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { ilike, or, sql, and, inArray, eq, countDistinct } from "drizzle-orm";
+import {
+  ilike,
+  or,
+  sql,
+  and,
+  inArray,
+  eq,
+  countDistinct,
+  count,
+} from "drizzle-orm";
 
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { questionInstances, questions } from "~/server/db/question";
@@ -38,20 +47,21 @@ function getWhereConditions(input: {
   }
 
   if (input.categoryIds && input.categoryIds.length > 0) {
-    whereConditions.push(inArray(categories.id, input.categoryIds));
+    whereConditions.push(
+      inArray(questionInstances.categoryId, input.categoryIds),
+    );
   }
 
   return and(...whereConditions);
 }
 
 export const questionDatabaseRouter = createTRPCRouter({
-  getQuestions: publicProcedure
+  getQuestionsWithAllCategories: publicProcedure
     .input(
       z.object({
-        search: z.string().optional(),
-        categoryIds: z.array(z.number()).optional(),
         licenseId: z.number().optional(),
-        randomOrder: z.boolean().default(false),
+        categoryIds: z.array(z.number()).optional(),
+        search: z.string().optional(),
         limit: z.number().max(100).optional(),
         offset: z.number().optional(),
       }),
@@ -84,7 +94,33 @@ export const questionDatabaseRouter = createTRPCRouter({
         .innerJoin(licenses, eq(categories.licenseId, licenses.id))
         .where(getWhereConditions(input))
         .groupBy(questions.id)
-        .orderBy(input.randomOrder ? sql`RANDOM()` : questions.externalId)
+        .orderBy(questions.externalId)
+        .limit(input.limit ?? 20)
+        .offset(input.offset ?? 0);
+    }),
+
+  getQuestions: publicProcedure
+    .input(
+      z.object({
+        categoryIds: z.array(z.number()).optional(),
+        search: z.string().optional(),
+        limit: z.number().max(100).optional(),
+        offset: z.number().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      return await ctx.db
+        .select({
+          question: questions,
+          questionInstance: questionInstances,
+        })
+        .from(questions)
+        .innerJoin(
+          questionInstances,
+          eq(questions.id, questionInstances.questionId),
+        )
+        .where(getWhereConditions(input))
+        .orderBy(questions.externalId)
         .limit(input.limit ?? 20)
         .offset(input.offset ?? 0);
     }),
@@ -98,7 +134,8 @@ export const questionDatabaseRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       const c = await ctx.db
-        .select({ count: countDistinct(questions.id) })
+        // .select({ count: countDistinct(questions.id) })
+        .select({ count: count() })
         .from(questions)
         .innerJoin(
           questionInstances,

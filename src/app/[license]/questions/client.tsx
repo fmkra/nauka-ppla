@@ -5,12 +5,12 @@ import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
 import { Question } from "~/app/_components/question";
 import { Spinner } from "~/components/ui/spinner";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type SelectOption } from "~/components/ui/select";
 import usePagination from "~/app/_components/pagination";
 import { CategoryFilter } from "./category-filter";
-import { LicenseFilter } from "./license-filter";
+// import { LicenseFilter } from "./license-filter";
 
 const pageSizeOptions: SelectOption[] = [
   { value: "5", label: "5 pytań" },
@@ -20,23 +20,43 @@ const pageSizeOptions: SelectOption[] = [
   { value: "100", label: "100 pytań" },
 ];
 
+export type Category = {
+  id: number;
+  name: string;
+  color: string | null;
+};
+
 export default function QuestionsPageClient({
-  defaultLicenseId,
+  categories,
 }: {
-  defaultLicenseId: number;
+  categories: Category[];
 }) {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-  const [selectedLicenses, setSelectedLicenses] = useState<number[]>([
-    defaultLicenseId,
-  ]);
+  const categoryIds = useMemo(
+    () =>
+      selectedCategories.length > 0
+        ? selectedCategories
+        : categories.map((x) => x.id),
+    [selectedCategories, categories],
+  );
+  // const [selectedLicenses, setSelectedLicenses] = useState<number[]>([
+  //   defaultLicenseId,
+  // ]);
   const searchDebounced = useDebounce(search, 500);
+
+  const categoriesMapping = useMemo(() => {
+    const output = {} as Record<number, Category>;
+    for (const category of categories) {
+      output[category.id] = category;
+    }
+    return output;
+  }, [categories]);
 
   const { data: totalCount, isLoading: countLoading } =
     api.questionDatabase.getQuestionsCount.useQuery({
       search: searchDebounced,
-      categoryIds:
-        selectedCategories.length > 0 ? selectedCategories : undefined,
+      categoryIds,
     });
 
   const pagination = usePagination(pageSizeOptions, "20", totalCount);
@@ -49,8 +69,7 @@ export default function QuestionsPageClient({
   const { data: questions, isLoading: questionsLoading } =
     api.questionDatabase.getQuestions.useQuery({
       search: searchDebounced,
-      categoryIds:
-        selectedCategories.length > 0 ? selectedCategories : undefined,
+      categoryIds,
       limit: pagination.limit,
       offset: pagination.offset,
     });
@@ -69,13 +88,14 @@ export default function QuestionsPageClient({
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="w-32">{pagination.pageSizeSelector}</div>
-        <LicenseFilter
+        {/* <div className="w-32">{pagination.pageSizeSelector}</div> */}
+        {/* <LicenseFilter
           selectedLicenses={selectedLicenses}
           onLicensesChange={setSelectedLicenses}
-        />
+        /> */}
         <CategoryFilter
-          licenseIds={selectedLicenses}
+          // licenseIds={selectedLicenses}
+          categories={categories}
           selectedCategories={selectedCategories}
           onCategoriesChange={setSelectedCategories}
         />
@@ -102,13 +122,25 @@ export default function QuestionsPageClient({
             </span>
           </div>
 
-          <div className="grid gap-6">
+          <div className="mb-6 grid gap-6">
             {questions.map((q) => (
-              <Question question={q} key={q.question.id} showLicense={true} />
+              // <Question question={q} key={q.question.id} showLicense={true} />
+              <Question
+                key={q.questionInstance.id}
+                question={q.question}
+                category={categoriesMapping[q.questionInstance.categoryId]!}
+              />
             ))}
           </div>
 
-          {pagination.footer}
+          {/* {pagination.footer} */}
+          <div className="mt-8 flex flex-wrap items-center gap-y-4">
+            <div className="ml-auto">{pagination.footer}</div>
+            <div className="ml-auto flex items-center gap-2">
+              <p className="text-sm">Ilość na stronę: </p>
+              <div className="w-36">{pagination.pageSizeSelector}</div>
+            </div>
+          </div>
         </>
       )}
     </>
