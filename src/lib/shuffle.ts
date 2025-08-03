@@ -1,7 +1,6 @@
 import XXH from "xxhashjs";
 
 export function getRandomNumber(input: string): number {
-  console.log("random for", input);
   return XXH.h32(input, 0).toNumber();
 }
 

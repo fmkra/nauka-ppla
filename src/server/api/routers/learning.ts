@@ -58,25 +58,6 @@ export const learningRouter = createTRPCRouter({
           },
         });
 
-      // await ctx.db.execute(sql`
-      //   INSERT INTO ${lp}
-      //   SELECT
-      //     gen_random_uuid() AS \"${sql.raw(lp.id.name)}\",
-      //     ${ctx.session.user.id} AS \"${sql.raw(lp.userId.name)}\",
-      //     ${questionInstances.id} AS \"${sql.raw(lp.questionInstanceId.name)}\",
-      //     1 AS \"${sql.raw(lp.latestAttempt.name)}\",
-      //     RANDOM() * ${input.isRandom ? 1 : 0} AS \"${sql.raw(lp.random.name)}\",
-      //     false AS \"${sql.raw(lp.isDone.name)}\",
-      //     0 AS \"${sql.raw(lp.correctCount.name)}\",
-      //     0 AS \"${sql.raw(lp.incorrectCount.name)}\"
-      //   FROM ${questionInstances}
-      //   WHERE ${questionInstances.categoryId} = ${input.categoryId}
-      //   ON CONFLICT (\"${sql.raw(lp.userId.name)}\", \"${sql.raw(lp.questionInstanceId.name)}\") DO UPDATE SET
-      //     \"${sql.raw(lp.latestAttempt.name)}\" = 1,
-      //     \"${sql.raw(lp.random.name)}\" = RANDOM() * ${input.isRandom ? 1 : 0},
-      //     \"${sql.raw(lp.isDone.name)}\" = false
-      // `);
-
       await ctx.db
         .insert(learningCategory)
         .values({
@@ -91,14 +72,6 @@ export const learningRouter = createTRPCRouter({
             latestAttempt: 1,
           },
         });
-
-      // await ctx.db.execute(sql`
-      //   INSERT INTO ${learningCategory}
-      //   (\"${sql.raw(learningCategory.id.name)}\", \"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\", \"${sql.raw(learningCategory.latestAttempt.name)}\")
-      //   VALUES (${crypto.randomUUID()}, ${ctx.session.user.id}, ${input.categoryId}, 1)
-      //   ON CONFLICT (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\") DO UPDATE SET
-      //     \"${sql.raw(learningCategory.latestAttempt.name)}\" = 1
-      // `);
     }),
 
   deleteLearningProgress: protectedProcedure
@@ -114,10 +87,14 @@ export const learningRouter = createTRPCRouter({
         WHERE ${learningProgress.userId} = ${ctx.session.user.id} AND ${questionInstances.categoryId} = ${input.categoryId}
       `);
 
-      await ctx.db.execute(sql`
-        DELETE FROM ${learningCategory}
-        WHERE \"${sql.raw(learningCategory.userId.name)}\" = ${ctx.session.user.id} AND \"${sql.raw(learningCategory.categoryId.name)}\" = ${input.categoryId}
-      `);
+      await ctx.db
+        .delete(learningCategory)
+        .where(
+          and(
+            eq(learningCategory.userId, ctx.session.user.id),
+            eq(learningCategory.categoryId, input.categoryId),
+          ),
+        );
     }),
 
   // Public so that we can handle unauthorized here

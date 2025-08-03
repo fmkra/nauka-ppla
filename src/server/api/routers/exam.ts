@@ -48,7 +48,6 @@ export const examRouter = createTRPCRouter({
         categoryId: sql.raw(questionInstances.categoryId.name),
       };
 
-      // TODO: Get number of questions from category
       await ctx.db.execute(sql`
           INSERT INTO ${examQuestions} ("${c.examAttemptId}", "${c.questionInstanceId}", "${c.answer}")
           SELECT
@@ -60,6 +59,21 @@ export const examRouter = createTRPCRouter({
           ORDER BY random()
           LIMIT ${questionCount}
         `);
+      // TODO: when https://github.com/drizzle-team/drizzle-orm/issues/3608 is fixed use this instead:
+      // await ctx.db.insert(examQuestions).select(
+      //   ctx.db
+      //     .select({
+      //       examAttemptId: sql`${id}`.as(examQuestions.examAttemptId.name),
+      //       questionInstanceId: sql`${questionInstances.id}`.as(
+      //         examQuestions.questionInstanceId.name,
+      //       ),
+      //       answer: sql`NULL`.as(examQuestions.answer.name),
+      //     })
+      //     .from(questionInstances)
+      //     .where(eq(questionInstances.categoryId, input.categoryId))
+      //     .orderBy(sql`random()`)
+      //     .limit(questionCount),
+      // );
 
       return id;
     }),
