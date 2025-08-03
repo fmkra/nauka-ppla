@@ -7,10 +7,11 @@ import type {
   AnswerQuestionInput,
   ExtendedAttempt,
 } from "~/app/[license]/learn/[category]/category-learning-client";
-import { cn, randomizeQuestion } from "~/lib/utils";
+import { cn } from "~/lib/utils";
 import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Spinner } from "~/components/ui/spinner";
+import { shuffleAnswers, getRandomNumber } from "~/lib/shuffle";
 
 type Question =
   inferRouterOutputs<AppRouter>["learning"]["getQuestions"][number];
@@ -27,9 +28,9 @@ export function LearningQuestions({
   answerQuestion: (data: AnswerQuestionInput) => void;
 }) {
   const parsedQuestion = useMemo(() => {
-    // TODO: randomness based on data from db (random and latestAttempt)
     if (!question) return null;
-    return randomizeQuestion(question.question);
+    const randomness = `${question.learning_progress.id}_${question.learning_progress.latestAttempt}`;
+    return shuffleAnswers(question.question, getRandomNumber(randomness));
   }, [question]);
 
   const [selected, setSelected] = useState<number | null>(null);

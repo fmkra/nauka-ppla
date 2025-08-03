@@ -4,7 +4,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { examAttempt, examQuestions } from "~/server/db/exam";
 import ExamPageClient from "./client";
-import { randomizeQuestion } from "~/lib/utils";
+import { getRandomNumber, shuffleAnswers } from "~/lib/shuffle";
 
 export default async function ExamAttempt({
   params,
@@ -44,7 +44,10 @@ export default async function ExamAttempt({
   }
 
   const questionsParsed = questions.map((examQuestion) => ({
-    ...randomizeQuestion(examQuestion.questionInstance.question),
+    ...shuffleAnswers(
+      examQuestion.questionInstance.question,
+      getRandomNumber(`${exam.id}_${examQuestion.questionInstanceId}`),
+    ),
     answer: examQuestion.answer,
     questionInstanceId: examQuestion.questionInstance.id,
   }));

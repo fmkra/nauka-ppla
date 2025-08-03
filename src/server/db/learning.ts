@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { primaryKey } from "drizzle-orm/pg-core";
+import { uniqueIndex } from "drizzle-orm/pg-core";
 import { createTable } from "./creator";
 import { users } from "./user";
 import { questionInstances } from "./question";
@@ -9,6 +9,10 @@ import { categories } from "./category";
 export const learningProgress = createTable(
   "learning_progress",
   (d) => ({
+    id: d
+      .varchar({ length: 255 })
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     userId: d
       .varchar({ length: 255 })
       .notNull()
@@ -23,9 +27,7 @@ export const learningProgress = createTable(
     correctCount: d.integer().notNull(),
     incorrectCount: d.integer().notNull(),
   }),
-  (table) => [
-    primaryKey({ columns: [table.userId, table.questionInstanceId] }),
-  ],
+  (table) => [uniqueIndex().on(table.userId, table.questionInstanceId)],
 );
 
 export const learningProgressRelations = relations(
@@ -44,6 +46,10 @@ export const learningProgressRelations = relations(
 export const learningCategory = createTable(
   "learning_category",
   (d) => ({
+    id: d
+      .varchar({ length: 255 })
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
     userId: d
       .varchar({ length: 255 })
       .notNull()
@@ -54,5 +60,5 @@ export const learningCategory = createTable(
       .references(() => categories.id),
     latestAttempt: d.integer().notNull(),
   }),
-  (table) => [primaryKey({ columns: [table.userId, table.categoryId] })],
+  (table) => [uniqueIndex().on(table.userId, table.categoryId)],
 );

@@ -63,7 +63,9 @@ export default async function LearnCategoryPage({
         <div className="flex items-start justify-between">
           <div>
             <h1 className="mb-2 flex items-center text-3xl font-bold">
-              {getIcon(categoryData.icon, "mr-2 h-6 w-6")}
+              <div className="relative mr-2 h-8 w-8">
+                {getIcon(categoryData.icon)}
+              </div>
               {categoryData.name}
             </h1>
             <p className="text-muted-foreground mb-4 max-w-2xl">

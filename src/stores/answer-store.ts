@@ -10,6 +10,7 @@ interface AnswerStore {
   ) => [number | null, (answer: number | null) => void];
 }
 
+// TODO: should answers be stored per question or per question instance?
 export const useAnswerStore = create<AnswerStore>()(
   persist(
     (set, get) => ({

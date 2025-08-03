@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { useMemo } from "react";
 import { Button } from "~/components/ui/button";
-import { randomizeQuestion, type QuestionBase } from "~/lib/utils";
 import { Info } from "lucide-react";
 import {
   Tooltip,
@@ -13,7 +12,12 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useAnswerStore } from "~/stores";
-import type { Category } from "../[license]/questions/client";
+import type { Category } from "./client";
+import {
+  getRandomNumber,
+  shuffleAnswers,
+  type QuestionBase,
+} from "~/lib/shuffle";
 // import type { CategoryAgg } from "~/server/api/routers/question_database";
 
 function getStyle(color: string | null | undefined) {
@@ -41,7 +45,8 @@ export function Question({
   category: Category;
   // showLicense: boolean;
 }) {
-  const question = useMemo(() => randomizeQuestion(q), [q]);
+  // TODO: randomize it based on more than just id
+  const question = useMemo(() => shuffleAnswers(q, getRandomNumber(q.id)), [q]);
 
   const { answerState } = useAnswerStore();
   // `selected` is NOT index of displayed items but index in database (before shuffling)

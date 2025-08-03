@@ -6,7 +6,7 @@ import {
   protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
-import { learningProgress as lp, learningCategory } from "~/server/db/learning";
+import { learningProgress, learningCategory } from "~/server/db/learning";
 import { questionInstances, questions } from "~/server/db/question";
 import { categories } from "~/server/db/category";
 
@@ -25,31 +25,80 @@ export const learningRouter = createTRPCRouter({
       // Keep correctCount and incorrectCount at previous value if they exist,
       // otherwise set to 0.
 
-      await ctx.db.execute(sql`
-        INSERT INTO ${lp}
-        SELECT
-          ${ctx.session.user.id} AS \"${sql.raw(lp.userId.name)}\",
-          ${questionInstances.id} AS \"${sql.raw(lp.questionInstanceId.name)}\",
-          1 AS \"${sql.raw(lp.latestAttempt.name)}\",
-          RANDOM() * ${input.isRandom ? 1 : 0} AS \"${sql.raw(lp.random.name)}\",
-          false AS \"${sql.raw(lp.isDone.name)}\",
-          0 AS \"${sql.raw(lp.correctCount.name)}\",
-          0 AS \"${sql.raw(lp.incorrectCount.name)}\"
-        FROM ${questionInstances}
-        WHERE ${questionInstances.categoryId} = ${input.categoryId}
-        ON CONFLICT (\"${sql.raw(lp.userId.name)}\", \"${sql.raw(lp.questionInstanceId.name)}\") DO UPDATE SET
-          \"${sql.raw(lp.latestAttempt.name)}\" = 1,
-          \"${sql.raw(lp.random.name)}\" = RANDOM() * ${input.isRandom ? 1 : 0},
-          \"${sql.raw(lp.isDone.name)}\" = false
-      `);
+      await ctx.db
+        .insert(learningProgress)
+        .select(
+          ctx.db
+            .select({
+              id: sql`gen_random_uuid()`.as(learningProgress.id.name),
+              userId: sql`${ctx.session.user.id}`.as(
+                learningProgress.userId.name,
+              ),
+              questionInstanceId: questionInstances.id,
+              latestAttempt: sql`1`.as(learningProgress.latestAttempt.name),
+              random: sql`RANDOM() * ${input.isRandom ? 1 : 0}`.as(
+                learningProgress.random.name,
+              ),
+              isDone: sql`false`.as(learningProgress.isDone.name),
+              correctCount: sql`0`.as(learningProgress.correctCount.name),
+              incorrectCount: sql`0`.as(learningProgress.incorrectCount.name),
+            })
+            .from(questionInstances)
+            .where(eq(questionInstances.categoryId, input.categoryId)),
+        )
+        .onConflictDoUpdate({
+          target: [
+            learningProgress.userId,
+            learningProgress.questionInstanceId,
+          ],
+          set: {
+            latestAttempt: sql`1`,
+            random: sql`RANDOM() * ${input.isRandom ? 1 : 0}`,
+            isDone: sql`false`,
+          },
+        });
 
-      await ctx.db.execute(sql`
-        INSERT INTO ${learningCategory}
-        (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\", \"${sql.raw(learningCategory.latestAttempt.name)}\")
-        VALUES (${ctx.session.user.id}, ${input.categoryId}, 1)
-        ON CONFLICT (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\") DO UPDATE SET 
-          \"${sql.raw(learningCategory.latestAttempt.name)}\" = 1
-      `);
+      // await ctx.db.execute(sql`
+      //   INSERT INTO ${lp}
+      //   SELECT
+      //     gen_random_uuid() AS \"${sql.raw(lp.id.name)}\",
+      //     ${ctx.session.user.id} AS \"${sql.raw(lp.userId.name)}\",
+      //     ${questionInstances.id} AS \"${sql.raw(lp.questionInstanceId.name)}\",
+      //     1 AS \"${sql.raw(lp.latestAttempt.name)}\",
+      //     RANDOM() * ${input.isRandom ? 1 : 0} AS \"${sql.raw(lp.random.name)}\",
+      //     false AS \"${sql.raw(lp.isDone.name)}\",
+      //     0 AS \"${sql.raw(lp.correctCount.name)}\",
+      //     0 AS \"${sql.raw(lp.incorrectCount.name)}\"
+      //   FROM ${questionInstances}
+      //   WHERE ${questionInstances.categoryId} = ${input.categoryId}
+      //   ON CONFLICT (\"${sql.raw(lp.userId.name)}\", \"${sql.raw(lp.questionInstanceId.name)}\") DO UPDATE SET
+      //     \"${sql.raw(lp.latestAttempt.name)}\" = 1,
+      //     \"${sql.raw(lp.random.name)}\" = RANDOM() * ${input.isRandom ? 1 : 0},
+      //     \"${sql.raw(lp.isDone.name)}\" = false
+      // `);
+
+      await ctx.db
+        .insert(learningCategory)
+        .values({
+          id: crypto.randomUUID(),
+          userId: ctx.session.user.id,
+          categoryId: input.categoryId,
+          latestAttempt: 1,
+        })
+        .onConflictDoUpdate({
+          target: [learningCategory.userId, learningCategory.categoryId],
+          set: {
+            latestAttempt: 1,
+          },
+        });
+
+      // await ctx.db.execute(sql`
+      //   INSERT INTO ${learningCategory}
+      //   (\"${sql.raw(learningCategory.id.name)}\", \"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\", \"${sql.raw(learningCategory.latestAttempt.name)}\")
+      //   VALUES (${crypto.randomUUID()}, ${ctx.session.user.id}, ${input.categoryId}, 1)
+      //   ON CONFLICT (\"${sql.raw(learningCategory.userId.name)}\", \"${sql.raw(learningCategory.categoryId.name)}\") DO UPDATE SET
+      //     \"${sql.raw(learningCategory.latestAttempt.name)}\" = 1
+      // `);
     }),
 
   deleteLearningProgress: protectedProcedure
@@ -60,9 +109,9 @@ export const learningRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db.execute(sql`
-        DELETE ${lp} FROM ${lp}
-        INNER JOIN ${questionInstances} ON ${lp.questionInstanceId} = ${questionInstances.id}
-        WHERE ${lp.userId} = ${ctx.session.user.id} AND ${questionInstances.categoryId} = ${input.categoryId}
+        DELETE ${learningProgress} FROM ${learningProgress}
+        INNER JOIN ${questionInstances} ON ${learningProgress.questionInstanceId} = ${questionInstances.id}
+        WHERE ${learningProgress.userId} = ${ctx.session.user.id} AND ${questionInstances.categoryId} = ${input.categoryId}
       `);
 
       await ctx.db.execute(sql`
@@ -111,9 +160,9 @@ export const learningRouter = createTRPCRouter({
           COUNT(*) FILTER (WHERE \"latestAttempt\" = ${currentAttempt} AND \"isDone\" = true) AS "answeredCorrectly",
           COUNT(*) FILTER (WHERE \"latestAttempt\" > ${currentAttempt}) AS "answeredIncorrectly",
           COUNT(*) FILTER (WHERE \"latestAttempt\" = ${currentAttempt} AND \"isDone\" = false) AS "notAnswered"
-        FROM ${lp}
-        JOIN ${questionInstances} ON ${lp.questionInstanceId} = ${questionInstances.id}
-        WHERE ${lp.userId} = ${ctx.session.user.id} AND ${questionInstances.categoryId} = ${input.categoryId}
+        FROM ${learningProgress}
+        JOIN ${questionInstances} ON ${learningProgress.questionInstanceId} = ${questionInstances.id}
+        WHERE ${learningProgress.userId} = ${ctx.session.user.id} AND ${questionInstances.categoryId} = ${input.categoryId}
       `);
 
       const previouslyAnswered = Number(q[0]!.previouslyAnswered);
@@ -164,20 +213,24 @@ export const learningRouter = createTRPCRouter({
 
       const q = await ctx.db
         .select()
-        .from(lp)
+        .from(learningProgress)
         .innerJoin(
           questionInstances,
-          eq(lp.questionInstanceId, questionInstances.id),
+          eq(learningProgress.questionInstanceId, questionInstances.id),
         )
         .innerJoin(questions, eq(questionInstances.questionId, questions.id))
         .where(
           and(
-            eq(lp.userId, ctx.session.user.id),
+            eq(learningProgress.userId, ctx.session.user.id),
             eq(questionInstances.categoryId, input.categoryId),
-            gte(lp.latestAttempt, input.attemptNumber),
+            gte(learningProgress.latestAttempt, input.attemptNumber),
           ),
         )
-        .orderBy(asc(lp.random), asc(questions.externalId), asc(questions.id))
+        .orderBy(
+          asc(learningProgress.random),
+          asc(questions.externalId),
+          asc(questions.id),
+        )
         .limit(input.limit)
         .offset(input.cursor ?? 0);
 
@@ -197,15 +250,15 @@ export const learningRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       await ctx.db
-        .update(lp)
+        .update(learningProgress)
         .set({
           isDone: input.isCorrect,
           latestAttempt: input.isCorrect ? undefined : input.attemptNumber + 1,
         })
         .where(
           and(
-            eq(lp.userId, ctx.session.user.id),
-            eq(lp.questionInstanceId, input.questionInstanceId),
+            eq(learningProgress.userId, ctx.session.user.id),
+            eq(learningProgress.questionInstanceId, input.questionInstanceId),
           ),
         );
     }),
@@ -226,11 +279,14 @@ export const learningRouter = createTRPCRouter({
           total: sql<number>`COUNT(*)`,
         })
         .from(questionInstances)
-        .innerJoin(lp, eq(questionInstances.id, lp.questionInstanceId))
+        .innerJoin(
+          learningProgress,
+          eq(questionInstances.id, learningProgress.questionInstanceId),
+        )
         .innerJoin(categories, eq(questionInstances.categoryId, categories.id))
         .where(
           and(
-            eq(lp.userId, ctx.session.user.id),
+            eq(learningProgress.userId, ctx.session.user.id),
             eq(categories.licenseId, input.licenseId),
           ),
         )
