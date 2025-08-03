@@ -12,6 +12,13 @@ import { useMemo, useState } from "react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Spinner } from "~/components/ui/spinner";
 import { shuffleAnswers, getRandomNumber } from "~/lib/shuffle";
+import MdRender from "~/app/_components/md-render";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
 
 type Question =
   inferRouterOutputs<AppRouter>["learning"]["getQuestions"][number];
@@ -44,6 +51,20 @@ export function LearningQuestions({
     });
     setSelected(null);
   };
+
+  const nextButton = (
+    <Button
+      disabled={isAnswerQuestionPending || selected === null}
+      onClick={next}
+      className="w-20"
+    >
+      {isAnswerQuestionPending && selected !== null ? (
+        <Spinner size="sm" />
+      ) : (
+        "Dalej"
+      )}
+    </Button>
+  );
 
   return (
     <div className="w-full max-w-4xl">
@@ -96,19 +117,23 @@ export function LearningQuestions({
               </div>
             )}
           </div>
-          <div className="flex w-full justify-end">
-            <Button
-              disabled={isAnswerQuestionPending || selected === null}
-              onClick={next}
-              className="w-20"
-            >
-              {isAnswerQuestionPending && selected !== null ? (
-                <Spinner size="sm" />
-              ) : (
-                "Dalej"
-              )}
-            </Button>
-          </div>
+          {question?.explanation ? (
+            <Accordion type="single" collapsible>
+              <AccordionItem value="explanation">
+                <div className="flex w-full items-center justify-between">
+                  <AccordionTrigger className="p-0">
+                    Wyjaśnienie
+                  </AccordionTrigger>
+                  {nextButton}
+                </div>
+                <AccordionContent>
+                  <MdRender>{question?.explanation?.explanation}</MdRender>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          ) : (
+            <div className="flex w-full justify-end">{nextButton}</div>
+          )}
         </CardContent>
       </Card>
     </div>

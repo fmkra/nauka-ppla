@@ -9,6 +9,7 @@ import {
 import { learningProgress, learningCategory } from "~/server/db/learning";
 import { questionInstances, questions } from "~/server/db/question";
 import { categories } from "~/server/db/category";
+import { explanations } from "~/server/db/explanation";
 
 export const learningRouter = createTRPCRouter({
   resetLearningProgress: protectedProcedure
@@ -196,6 +197,7 @@ export const learningRouter = createTRPCRouter({
           eq(learningProgress.questionInstanceId, questionInstances.id),
         )
         .innerJoin(questions, eq(questionInstances.questionId, questions.id))
+        .leftJoin(explanations, eq(questions.explanationId, explanations.id))
         .where(
           and(
             eq(learningProgress.userId, ctx.session.user.id),

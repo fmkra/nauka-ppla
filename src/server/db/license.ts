@@ -1,4 +1,4 @@
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 
 export const licenses = createTable("license", (d) => ({
   id: d.integer().primaryKey().generatedByDefaultAsIdentity(),

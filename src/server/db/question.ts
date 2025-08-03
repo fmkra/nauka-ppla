@@ -1,8 +1,9 @@
 import { relations, sql } from "drizzle-orm";
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 import { users } from "./user";
 import { categories } from "./category";
 import { questionsToTags } from "./tag";
+import { explanations } from "./explanation";
 
 export const questions = createTable("question", (d) => ({
   id: d
@@ -20,11 +21,16 @@ export const questions = createTable("question", (d) => ({
   createdAt: d
     .timestamp({ withTimezone: true })
     .default(sql`CURRENT_TIMESTAMP`),
+  explanationId: d.varchar({ length: 255 }).references(() => explanations.id),
 }));
 
-export const questionsRelations = relations(questions, ({ many }) => ({
+export const questionsRelations = relations(questions, ({ many, one }) => ({
   tags: many(questionsToTags),
   questionInstances: many(questionInstances),
+  explanation: one(explanations, {
+    fields: [questions.explanationId],
+    references: [explanations.id],
+  }),
 }));
 
 export const questionInstances = createTable("question_instance", (d) => ({

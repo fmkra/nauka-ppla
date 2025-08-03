@@ -1,6 +1,6 @@
 import { relations } from "drizzle-orm";
 import { uniqueIndex } from "drizzle-orm/pg-core";
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 import { users } from "./user";
 import { questionInstances } from "./question";
 import { categories } from "./category";

@@ -1,5 +1,9 @@
+import typography from"@tailwindcss/typography"
+
 export default {
   plugins: {
-    "@tailwindcss/postcss": {},
+    "@tailwindcss/postcss": {
+      plugins: [typography],
+    },
   },
 };

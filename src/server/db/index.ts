@@ -10,7 +10,8 @@ import * as learning from "./learning";
 import * as category from "./category";
 import * as license from "./license";
 import * as exam from "./exam";
-import { createTable } from "./creator";
+import * as explanation from "./explanation";
+import { createTable } from "./_creator";
 
 /**
  * Cache the database connection in development. This avoids creating a new connection on every HMR
@@ -33,5 +34,6 @@ export const db = drizzle(conn, {
     ...category,
     ...license,
     ...exam,
+    ...explanation,
   },
 });

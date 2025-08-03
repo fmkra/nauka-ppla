@@ -1,6 +1,6 @@
 import { pgEnum } from "drizzle-orm/pg-core";
 import { categories } from "./category";
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 import { users } from "./user";
 import { questionInstances } from "./question";
 import { relations } from "drizzle-orm";

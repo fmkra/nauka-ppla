@@ -1,5 +1,5 @@
 import { unique } from "drizzle-orm/pg-core";
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 import { relations } from "drizzle-orm";
 import { licenses } from "./license";
 import { questionInstances } from "./question";

@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { createTable } from "./creator";
+import { createTable } from "./_creator";
 import { questions } from "./question";
 
 export const tags = createTable("tag", (d) => ({
