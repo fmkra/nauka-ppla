@@ -1,0 +1,262 @@
+{
+  "licenses": [
+    {
+      "name": "PPL(A)",
+      "description": "Licencja pilota samolotowego turystycznego",
+      "url": "ppla",
+      "icon": "url:/img/license/ppla.png"
+    },
+    {
+      "name": "SPL",
+      "description": "Licencja pilota szybowcowego",
+      "url": "spl",
+      "icon": "url:/img/license/spl.png"
+    },
+    {
+      "name": "BPL",
+      "description": "Licencja pilota balonowego",
+      "url": "bpl",
+      "icon": "url:/img/license/bpl.png"
+    },
+    {
+      "name": "PPL(H)",
+      "description": "Licencja pilota śmigłowca",
+      "url": "pplh",
+      "icon": "url:/img/license/pplh.png"
+    }
+  ],
+  "categories": [
+    {
+      "name": "Prawo lotnicze",
+      "url": "prawo-lotnicze",
+      "color": "#FFCDD2,#EF9A9A",
+      "description": "Zasady i przepisy prawa lotniczego, struktura przestrzeni powietrznej, procedury lotnicze",
+      "examTime": {
+        "bpl": 2700,
+        "spl": 2700,
+        "ppla": 2700,
+        "pplh": 2700
+      },
+      "examQuestions": {
+        "bpl": 28,
+        "spl": 32,
+        "ppla": 28,
+        "pplh": 28
+      },
+      "icon": "url:/img/category/prawo-lotnicze.png",
+      "topics": [
+        "Przepisy prawa lotniczego",
+        "Struktura przestrzeni powietrznej"
+      ],
+      "externalIds": "^PL(010|099|100|102)"
+    },
+    {
+      "name": "Ogólna wiedza o statku powietrznym",
+      "url": "ogolna-wiedza-o-statku-powietrznym",
+      "color": "#BBDEFB,#90CAF9",
+      "description": "Budowa i działanie samolotu, systemy pokładowe, zasady działania silników",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 1500,
+        "ppla": 1800,
+        "pplh": 1800
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 8,
+        "ppla": 16,
+        "pplh": 16
+      },
+      "icon": "url:/img/category/ogolna-wiedza-o-statku-powietrznym.png",
+      "topics": [
+        "Budowa samolotu",
+        "Systemy pokładowe",
+        "Silniki lotnicze",
+        "Układy sterowania"
+      ],
+      "externalIds": "^PL(020|021|024|025)"
+    },
+    {
+      "name": "Osiągi i planowanie lotu",
+      "url": "osiagi-i-planowanie-lotu",
+      "color": "#C8E6C9,#A5D6A7",
+      "description": "Planowanie tras, obliczenia nawigacyjne, przygotowanie do lotu",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 2400,
+        "ppla": 3600,
+        "pplh": 3600
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 20,
+        "pplh": 20
+      },
+      "icon": "url:/img/category/osiagi-i-planowanie-lotu.png",
+      "topics": [
+        "Planowanie tras",
+        "Obliczenia nawigacyjne",
+        "Przygotowanie do lotu",
+        "Dokumentacja lotnicza"
+      ],
+      "externalIds": "^PL030"
+    },
+    {
+      "name": "Człowiek - możliwości i ograniczenia",
+      "url": "czlowiek-mozliwosci-i-ograniczenia",
+      "color": "#E1BEE7,#CE93D8",
+      "description": "Czynniki ludzkie w lotnictwie, fizjologia lotnicza, decyzyjność",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 1800,
+        "ppla": 1800,
+        "pplh": 1800
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 12,
+        "pplh": 12
+      },
+      "icon": "url:/img/category/czlowiek-mozliwosci-i-ograniczenia.png",
+      "topics": [
+        "Czynniki ludzkie",
+        "Fizjologia lotnicza",
+        "Decyzyjność",
+        "Stres i zmęczenie"
+      ],
+      "externalIds": "^PL040"
+    },
+    {
+      "name": "Meteorologia",
+      "url": "meteorologia",
+      "color": "#FFE0B2,#FFCC80",
+      "description": "Zjawiska atmosferyczne, prognozy pogody, wpływ pogody na lotnictwo",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 1800,
+        "ppla": 1800,
+        "pplh": 1800
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 12,
+        "pplh": 12
+      },
+      "icon": "url:/img/category/meteorologia.png",
+      "topics": [
+        "Zjawiska atmosferyczne",
+        "Prognozy pogody",
+        "Fronty atmosferyczne",
+        "Turbulencja"
+      ],
+      "externalIds": "^PL050"
+    },
+    {
+      "name": "Nawigacja",
+      "url": "nawigacja",
+      "color": "#B2DFDB,#80CBC4",
+      "description": "Metody nawigacji, mapy lotnicze, przyrządy nawigacyjne, obliczenia kursów",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 2400,
+        "ppla": 3600,
+        "pplh": 3600
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 24,
+        "pplh": 24
+      },
+      "icon": "url:/img/category/nawigacja.png",
+      "topics": [
+        "Metody nawigacji",
+        "Mapy lotnicze",
+        "Przyrządy nawigacyjne",
+        "Obliczenia kursów"
+      ],
+      "externalIds": "^PL060"
+    },
+    {
+      "name": "Procedury operacyjne",
+      "url": "procedury-operacyjne",
+      "color": "#C5CAE9,#9FA8DA",
+      "description": "Procedury startu i lądowania, operacje lotnicze, bezpieczeństwo",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 1800,
+        "ppla": 1800,
+        "pplh": 1800
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 12,
+        "pplh": 12
+      },
+      "icon": "url:/img/category/procedury-operacyjne.png",
+      "topics": [
+        "Procedury startu",
+        "Procedury lądowania",
+        "Operacje lotnicze",
+        "Bezpieczeństwo"
+      ],
+      "externalIds": "^PL070"
+    },
+    {
+      "name": "Zasady lotu",
+      "url": "zasady-lotu",
+      "color": "#F8BBD0,#F48FB1",
+      "description": "Aerodynamika, charakterystyki lotu, manewry lotnicze, granice lotu",
+      "examTime": {
+        "bpl": 3600,
+        "spl": 3600,
+        "ppla": 2700,
+        "pplh": 2700
+      },
+      "examQuestions": {
+        "bpl": 24,
+        "spl": 24,
+        "ppla": 16,
+        "pplh": 16
+      },
+      "icon": "url:/img/category/zasady-lotu.png",
+      "topics": [
+        "Aerodynamika",
+        "Charakterystyki lotu",
+        "Manewry lotnicze",
+        "Granice lotu"
+      ],
+      "externalIds": "^PL080"
+    },
+    {
+      "name": "Łączność",
+      "url": "lacznosc",
+      "color": "#FFECB3,#FFE082",
+      "description": "Procedury komunikacji radiowej, frazeologia lotnicza, kody i znaki",
+      "examTime": {
+        "bpl": 1800,
+        "spl": 1500,
+        "ppla": 1800,
+        "pplh": 1800
+      },
+      "examQuestions": {
+        "bpl": 12,
+        "spl": 12,
+        "ppla": 12,
+        "pplh": 12
+      },
+      "icon": "url:/img/category/lacznosc.png",
+      "topics": [
+        "Procedury radiowe",
+        "Frazeologia lotnicza",
+        "Kody lotnicze",
+        "Znaki świetlne"
+      ],
+      "externalIds": "^PL090"
+    }
+  ]
+}
