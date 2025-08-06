@@ -18,6 +18,13 @@ import {
   shuffleAnswers,
   type QuestionBase,
 } from "~/lib/shuffle";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import MdRender from "~/app/_components/md-render";
 // import type { CategoryAgg } from "~/server/api/routers/question_database";
 
 function getStyle(color: string | null | undefined) {
@@ -38,11 +45,13 @@ function getStyle(color: string | null | undefined) {
 export function Question({
   question: q,
   category,
+  explanation,
   // showLicense,
 }: {
   // question: QuestionArg;
   question: QuestionBase;
   category: Category;
+  explanation: string | null;
   // showLicense: boolean;
 }) {
   // TODO: randomize it based on more than just id
@@ -78,22 +87,29 @@ export function Question({
             </button>
           ))}
         </div>
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setSelected(selected === null ? 0 : null)}
-          >
-            {selected === null
-              ? "Pokaż prawidłową odpowiedź"
-              : "Odznacz odpowiedź"}
-          </Button>
-          <div className="flex items-start justify-between gap-2">
-            {/* {question.tags?.map((tag) => (
+        <Accordion type="single" collapsible>
+          <AccordionItem value="explanation">
+            <div className="flex items-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelected(selected === null ? 0 : null)}
+              >
+                {selected === null
+                  ? "Pokaż prawidłową odpowiedź"
+                  : "Odznacz odpowiedź"}
+              </Button>
+              {explanation && (
+                <AccordionTrigger className="px-6 py-0">
+                  Wyjaśnienie
+                </AccordionTrigger>
+              )}
+              <div className="ml-auto flex items-start justify-between gap-2">
+                {/* {question.tags?.map((tag) => (
               <Badge key={tag.tag.id}>{tag.tag.name}</Badge>
             ))} */}
-            {/* TODO: this works good for multiple licenses page */}
-            {/* {q.categories.map((category) => (
+                {/* TODO: this works good for multiple licenses page */}
+                {/* {q.categories.map((category) => (
               <Badge
                 variant="secondary"
                 style={getStyle(category.color)}
@@ -103,23 +119,30 @@ export function Question({
                   category.name}
               </Badge>
             ))} */}
-            <Badge variant="secondary" style={getStyle(category.color)}>
-              {category.name}
-            </Badge>
-            {question.externalId && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Info className="text-muted-foreground my-[3px] h-4 w-4 cursor-help" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>{question.externalId}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                <Badge variant="secondary" style={getStyle(category.color)}>
+                  {category.name}
+                </Badge>
+                {question.externalId && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Info className="text-muted-foreground my-[3px] h-4 w-4 cursor-help" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{question.externalId}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            </div>
+            {explanation && (
+              <AccordionContent>
+                <MdRender>{explanation}</MdRender>
+              </AccordionContent>
             )}
-          </div>
-        </div>
+          </AccordionItem>
+        </Accordion>
       </CardContent>
     </Card>
   );

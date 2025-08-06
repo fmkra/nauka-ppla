@@ -5,7 +5,7 @@ import remarkGfm from "remark-gfm";
 
 export default function MdRender({ children }: { children: string }) {
   return (
-    <div className="prose max-w-none">
+    <div className="prose mt-2 max-w-none border-t pt-2">
       <ReactMarkdown
         remarkPlugins={[remarkMath, remarkGfm]}
         rehypePlugins={[rehypeKatex]}
