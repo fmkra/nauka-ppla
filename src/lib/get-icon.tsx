@@ -8,7 +8,8 @@ import { cn } from "~/lib/utils";
 
 export function getIcon(
   icon: string | null | undefined,
-  className?: string,
+  className?: string | null,
+  bakcground?: string,
 ): React.ReactNode {
   if (!icon) return null;
   if (icon.startsWith("lucide:")) {
@@ -23,6 +24,7 @@ export function getIcon(
         alt={icon}
         fill
         className={cn("rounded-lg", className)}
+        style={{ backgroundColor: bakcground }}
       />
     );
   }

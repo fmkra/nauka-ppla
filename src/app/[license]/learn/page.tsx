@@ -35,6 +35,7 @@ export default async function LearnPage({
     .select({
       id: categories.id,
       name: categories.name,
+      color: categories.color,
       url: categories.url,
       description: categories.description,
       icon: categories.icon,
@@ -69,7 +70,7 @@ export default async function LearnPage({
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 relative flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-                    {getIcon(card.icon)}
+                    {getIcon(card.icon, null, card.color?.split(",")[0])}
                   </div>
                   <div>
                     <CardTitle className="text-lg">{card.name}</CardTitle>

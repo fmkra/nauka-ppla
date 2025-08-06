@@ -27,6 +27,7 @@ export default async function LearnCategoryPage({
         id: categories.id,
         name: categories.name,
         url: categories.url,
+        color: categories.color,
         description: categories.description,
         icon: categories.icon,
         topics: categories.topics,
@@ -64,7 +65,11 @@ export default async function LearnCategoryPage({
           <div>
             <h1 className="mb-2 flex items-center text-3xl font-bold">
               <div className="relative mr-2 h-8 w-8">
-                {getIcon(categoryData.icon)}
+                {getIcon(
+                  categoryData.icon,
+                  null,
+                  categoryData.color?.split(",")[0],
+                )}
               </div>
               {categoryData.name}
             </h1>
