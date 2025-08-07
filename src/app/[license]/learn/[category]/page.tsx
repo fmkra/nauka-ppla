@@ -3,14 +3,9 @@ import { notFound } from "next/navigation";
 import { db } from "~/server/db";
 import { categories } from "~/server/db/category";
 import { licenses } from "~/server/db/license";
-import { questionInstances } from "~/server/db/question";
-import { count } from "drizzle-orm";
-import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import * as icons from "lucide-react";
 import Link from "next/link";
-import { formatTime, MINUTES_PER_QUESTION } from "~/lib/utils";
 import { getIcon } from "~/lib/get-icon";
 import { CategoryLearningClient } from "./category-learning-client";
 
