@@ -13,6 +13,8 @@ import { Clock } from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
 import { Progress } from "~/components/ui/progress";
 import { Badge } from "~/components/ui/badge";
+import { FlagTriangleRight } from "lucide-react";
+import { useExamFlagsStore } from "~/stores";
 
 export type Answer = "A" | "B" | "C" | "D" | null;
 
@@ -143,8 +145,16 @@ export default function Exam({
     setWarningMessage(false);
   };
 
+  const { flags, setFlag } = useExamFlagsStore().attempt(examAttemptId);
+
   const currentQ = questions[currentQuestion]!;
   const progress = ((currentQuestion + 1) / questions.length) * 100;
+
+  const questionInstanceId = questions[currentQuestion]!.questionInstanceId;
+  const hasFlag = flags[questionInstanceId] ?? false;
+  const toggleFlag = () => {
+    setFlag(questionInstanceId, !hasFlag);
+  };
 
   return (
     <>
@@ -256,29 +266,39 @@ export default function Exam({
           </Card>
 
           <div className="mt-6 flex justify-end">
+            <button className="cursor-pointer px-2" onClick={toggleFlag}>
+              <FlagTriangleRight className={hasFlag ? "text-red-500" : ""} />
+            </button>
             <Button onClick={() => setWarningMessage(true)}>
               Zakończ egzamin
             </Button>
           </div>
 
           <div className="bg-muted mt-6 rounded-lg p-4">
-            <h3 className="mb-2 font-medium">Progress Overview</h3>
+            <h3 className="mb-2 font-medium">Pytania</h3>
             <div className="flex flex-wrap gap-2">
-              {questions.map((_, index) => (
-                <Badge
+              {questions.map((q, index) => (
+                <button
+                  className="relative cursor-pointer"
                   key={index}
-                  variant={
-                    index === currentQuestion
-                      ? "default"
-                      : selectedAnswers[index] !== null
-                        ? "green"
-                        : "outline"
-                  }
-                  className="cursor-pointer"
                   onClick={() => selectQuestion(index)}
                 >
-                  {index + 1}
-                </Badge>
+                  {flags[q.questionInstanceId] && (
+                    <div className="absolute top-0 right-0 z-10 border-6 border-t-red-500 border-r-red-500 border-b-transparent border-l-transparent"></div>
+                  )}
+                  <Badge
+                    variant={
+                      index === currentQuestion
+                        ? "default"
+                        : selectedAnswers[index] !== null
+                          ? "green"
+                          : "outline"
+                    }
+                    className="block"
+                  >
+                    {index + 1}
+                  </Badge>
+                </button>
               ))}
             </div>
           </div>

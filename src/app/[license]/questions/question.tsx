@@ -12,7 +12,7 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { useAnswerStore } from "~/stores";
-import type { Category } from "./client";
+import type { Category } from "~/app/_components/category-filter";
 import {
   getRandomNumber,
   shuffleAnswers,
