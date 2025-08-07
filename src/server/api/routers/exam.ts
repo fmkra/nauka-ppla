@@ -2,7 +2,7 @@ import z from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { answerEnum, examAttempt, examQuestions } from "~/server/db/exam";
 import { questionInstances } from "~/server/db/question";
-import { sql, eq, and, count, desc } from "drizzle-orm";
+import { sql, eq, and, count, desc, asc } from "drizzle-orm";
 import { categories } from "~/server/db/category";
 
 export const examRouter = createTRPCRouter({
@@ -143,37 +143,81 @@ export const examRouter = createTRPCRouter({
         .offset(input.offset ?? 0);
     }),
 
+  getExam: protectedProcedure
+    .input(
+      z.object({
+        examAttemptId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const [exam, questions] = await Promise.all([
+        ctx.db.query.examAttempt.findFirst({
+          where: and(
+            eq(examAttempt.id, input.examAttemptId),
+            eq(examAttempt.userId, ctx.session.user.id),
+          ),
+        }),
+        ctx.db.query.examQuestions.findMany({
+          with: {
+            questionInstance: {
+              with: {
+                question: true,
+              },
+            },
+          },
+          where: eq(examQuestions.examAttemptId, input.examAttemptId),
+          orderBy: asc(examQuestions.id),
+        }),
+      ]);
+
+      if (!exam) {
+        return null;
+      }
+
+      return [exam, questions] as const;
+    }),
+
   answerQuestion: protectedProcedure
     .input(
       z.object({
         examAttemptId: z.string(),
-        questionInstanceId: z.string(),
-        answer: z.enum(answerEnum.enumValues).nullable(),
+        question: z
+          .object({
+            questionInstanceId: z.string(),
+            answer: z.enum(answerEnum.enumValues).nullable(),
+          })
+          .optional(),
         finishExam: z.boolean(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // TODO: consider removing this check, because examAttemptId is hard to guess
       const attempt = await ctx.db
         .select({ userId: examAttempt.userId })
         .from(examAttempt)
         .where(eq(examAttempt.id, input.examAttemptId));
 
       if (attempt[0]?.userId !== ctx.session.user.id) {
-        throw new Error("You are not allowed to answer this question");
+        throw new Error("You are not allowed to access this exam");
       }
 
-      const result = await ctx.db
-        .update(examQuestions)
-        .set({ answer: input.answer })
-        .where(
-          and(
-            eq(examQuestions.examAttemptId, input.examAttemptId),
-            eq(examQuestions.questionInstanceId, input.questionInstanceId),
-          ),
-        )
-        .returning();
+      if (input.question) {
+        const result = await ctx.db
+          .update(examQuestions)
+          .set({ answer: input.question.answer })
+          .where(
+            and(
+              eq(examQuestions.examAttemptId, input.examAttemptId),
+              eq(
+                examQuestions.questionInstanceId,
+                input.question.questionInstanceId,
+              ),
+            ),
+          )
+          .returning();
 
-      if (result.length === 0) throw new Error("Question not found");
+        if (result.length === 0) throw new Error("Question not found");
+      }
 
       if (input.finishExam) {
         await ctx.db

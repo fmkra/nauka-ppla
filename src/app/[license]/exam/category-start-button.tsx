@@ -23,6 +23,7 @@ export default function CategoryStartButton({
   const { mutate, isPending } = api.exam.newExam.useMutation({
     onSuccess: async (id) => {
       router.push(`${replaceLink ? "." : pathname}/${id}`);
+      // TODO: because invalidate happens before page is loaded, it immediately fetches new exams, so we should postpone it to page loading
       await utils.exam.getExamCount.invalidate();
       await utils.exam.getExams.invalidate();
     },

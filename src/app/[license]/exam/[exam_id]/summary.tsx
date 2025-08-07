@@ -1,0 +1,115 @@
+"use client";
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
+import { numberToAnswer, type QuestionWithAnswer } from "./exam";
+import { cn } from "~/lib/utils";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import { CheckCircle, CircleQuestionMark, XCircle } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import Link from "next/link";
+import CategoryStartButton from "../category-start-button";
+
+export default function ExamSummary({
+  questions,
+  categoryId,
+}: {
+  questions: QuestionWithAnswer[];
+  categoryId: number;
+}) {
+  const calculateScore = () => {
+    let correct = 0;
+    for (const question of questions) {
+      if (question.answer === "A") {
+        correct++;
+      }
+    }
+    return correct;
+  };
+
+  const score = calculateScore();
+  const percentage = (score / questions.length) * 100;
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <Card className="mx-auto max-w-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Wynik</CardTitle>
+          <CardDescription>To twoje wyniki egzaminu</CardDescription>
+        </CardHeader>
+        <CardContent className="text-center">
+          <div className="mb-6">
+            <div className="mb-2 text-4xl font-bold">
+              {percentage.toFixed(0)}%
+            </div>
+            <div className="text-muted-foreground">
+              {score} z {questions.length} odpowiedzi poprawnych
+            </div>
+          </div>
+
+          <Accordion type="single" collapsible>
+            {questions.map((question, index) => (
+              <AccordionItem key={question.id} value={question.id}>
+                <AccordionTrigger iconSide="left">
+                  <div className="flex w-full items-center justify-between">
+                    <span className="text-sm">Pytanie {index + 1}</span>
+                    <div>
+                      {question.answer === "A" ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : question.answer === null ? (
+                        <CircleQuestionMark className="h-5 w-5 text-slate-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600" />
+                      )}
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="text-left">
+                  <p className="mb-4">{question.question}</p>
+                  <div className="flex flex-col gap-3">
+                    {question.answers.map(([dbIndex, answer]) => (
+                      <div
+                        key={dbIndex}
+                        className={cn(
+                          "rounded-lg border px-4 py-3",
+                          question.answer === numberToAnswer(dbIndex) &&
+                            "border-red-500",
+                          dbIndex === 0 && "border-green-500",
+                        )}
+                      >
+                        {answer}
+                      </div>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+
+          <div className="flex justify-center gap-4">
+            <Button variant="outline" asChild>
+              <Link href=".">Wróć do egzaminów</Link>
+            </Button>
+            <CategoryStartButton
+              categoryId={categoryId}
+              className="w-34"
+              replaceLink
+            >
+              Rozpocznij nowy
+            </CategoryStartButton>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
