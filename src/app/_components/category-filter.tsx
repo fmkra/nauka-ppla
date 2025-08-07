@@ -14,7 +14,6 @@ import {
 // import { api } from "~/trpc/react";
 // import { Spinner } from "~/components/ui/spinner";
 import { conjugate } from "~/lib/utils";
-import type { Category } from "./client";
 
 function getStyle(color: string | null) {
   const colors = color?.split(",");
@@ -24,6 +23,12 @@ function getStyle(color: string | null) {
     borderColor: colors[1],
   };
 }
+
+export type Category = {
+  id: number;
+  name: string;
+  color: string | null;
+};
 
 interface CategoryFilterProps {
   // licenseIds: number[];

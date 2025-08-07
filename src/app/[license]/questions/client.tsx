@@ -9,7 +9,10 @@ import { useEffect, useMemo, useState } from "react";
 import { useDebounce } from "@uidotdev/usehooks";
 import { type SelectOption } from "~/components/ui/select";
 import usePagination from "~/app/_components/pagination";
-import { CategoryFilter } from "./category-filter";
+import {
+  CategoryFilter,
+  type Category,
+} from "../../_components/category-filter";
 // import { LicenseFilter } from "./license-filter";
 
 const pageSizeOptions: SelectOption[] = [
@@ -19,12 +22,6 @@ const pageSizeOptions: SelectOption[] = [
   { value: "50", label: "50 pytań" },
   { value: "100", label: "100 pytań" },
 ];
-
-export type Category = {
-  id: number;
-  name: string;
-  color: string | null;
-};
 
 export default function QuestionsPageClient({
   categories,

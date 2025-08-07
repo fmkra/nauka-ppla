@@ -4,6 +4,7 @@ import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import ExamList from "./exam_list";
 import ExamStart from "./exam_start";
+import { categories } from "~/server/db/category";
 
 export default async function ExamsPage({
   params,
@@ -24,10 +25,19 @@ export default async function ExamsPage({
     notFound();
   }
 
+  const categoriesData = await db
+    .select({
+      id: categories.id,
+      name: categories.name,
+      color: categories.color,
+    })
+    .from(categories)
+    .where(eq(categories.licenseId, license.id));
+
   return (
     <div>
       <ExamStart licenseId={license.id} />
-      <ExamList licenseId={license.id} />
+      <ExamList licenseId={license.id} categories={categoriesData} />
     </div>
   );
 }

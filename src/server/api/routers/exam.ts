@@ -2,7 +2,7 @@ import z from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { answerEnum, examAttempt, examQuestions } from "~/server/db/exam";
 import { questionInstances } from "~/server/db/question";
-import { sql, eq, and, count, desc, asc } from "drizzle-orm";
+import { sql, eq, and, count, desc, asc, inArray } from "drizzle-orm";
 import { categories } from "~/server/db/category";
 
 export const examRouter = createTRPCRouter({
@@ -109,6 +109,7 @@ export const examRouter = createTRPCRouter({
         licenseId: z.number(),
         limit: z.number().max(50).optional(),
         offset: z.number().optional(),
+        categoryIds: z.array(z.number()).optional(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -135,6 +136,9 @@ export const examRouter = createTRPCRouter({
           and(
             eq(categories.licenseId, input.licenseId),
             eq(examAttempt.userId, ctx.session.user.id),
+            ...(input.categoryIds?.length
+              ? [inArray(categories.id, input.categoryIds)]
+              : []),
           ),
         )
         .groupBy(categories.id, examAttempt.id)
