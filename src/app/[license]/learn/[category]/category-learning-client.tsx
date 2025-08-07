@@ -16,8 +16,6 @@ interface CategoryLearningClientProps {
     id: number;
     name: string;
     url: string;
-    description: string | null;
-    questionCount: number;
     licenseId: number | null;
   };
 }

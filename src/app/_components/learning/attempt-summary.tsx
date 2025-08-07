@@ -8,6 +8,7 @@ import {
 import { Button } from "~/components/ui/button";
 import type { ExtendedAttempt } from "~/app/[license]/learn/[category]/category-learning-client";
 import { api } from "~/trpc/react";
+import { conjugate } from "~/lib/utils";
 
 export function LearningAttemptSummary({
   attempt,
@@ -39,19 +40,9 @@ export function LearningAttemptSummary({
       <CardHeader>
         <CardTitle className="text-center">Podsumowanie podejścia</CardTitle>
         <CardDescription>
-          <ul>
-            <li>
-              W poprzednich podejściach odpowiedziałeś na{" "}
-              {attempt.previouslyAnswered} pytań.
-            </li>
-            <li>
-              W tym podejściu odpowiedziałeś poprawnie na{" "}
-              {attempt.answeredCorrectly} nowych pytań.
-            </li>
-            <li>
-              Pozostało ci {attempt.answeredIncorrectly} pytań do odpowiedzi.
-            </li>
-          </ul>
+          {generateSummaryContent(attempt).map((content, index) => (
+            <p key={index}>{content}</p>
+          ))}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -61,4 +52,19 @@ export function LearningAttemptSummary({
       </CardContent>
     </Card>
   );
+}
+
+function generateSummaryContent(attempt: ExtendedAttempt) {
+  return [
+    ...(attempt.currentAttempt == 1
+      ? [
+          `To było Twoje pierwsze podejście i odpowiedziałeś poprawnie na ${attempt.answeredCorrectly} ${conjugate(attempt.answeredCorrectly, "pytanie", "pytania", "pytań")}.`,
+        ]
+      : [
+          `W poprzednich podejściach odpowiedziałeś poprawnie na ${attempt.previouslyAnswered} ${conjugate(attempt.previouslyAnswered, "pytanie", "pytania", "pytań")}.`,
+          `W tym podejściu odpowiedziałeś poprawnie na ${attempt.answeredCorrectly} ${conjugate(attempt.answeredCorrectly, "nowe pytanie", "nowe pytania", "nowych pytań")}.`,
+        ]),
+
+    `${conjugate(attempt.answeredIncorrectly, "Pozostało", "Pozostały", "Pozostało")} ci ${attempt.answeredIncorrectly} ${conjugate(attempt.answeredIncorrectly, "pytanie", "pytania", "pytań")} do nauki.`,
+  ];
 }

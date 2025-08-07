@@ -28,17 +28,10 @@ export default async function LearnCategoryPage({
         name: categories.name,
         url: categories.url,
         color: categories.color,
-        description: categories.description,
         icon: categories.icon,
-        topics: categories.topics,
-        questionCount: count(questionInstances.id),
         licenseId: categories.licenseId,
       })
       .from(categories)
-      .leftJoin(
-        questionInstances,
-        eq(categories.id, questionInstances.categoryId),
-      )
       .leftJoin(licenses, eq(categories.licenseId, licenses.id))
       .where(and(eq(categories.url, categoryUrl), eq(licenses.url, licenseUrl)))
       .groupBy(categories.id)
@@ -50,8 +43,8 @@ export default async function LearnCategoryPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
+    <div className="container mx-auto flex min-h-[calc(100vh_-_12rem)] flex-col px-4 py-4">
+      <div className="mb-8 shrink-0">
         <div className="mb-4 flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>
             <Link href={`/${licenseUrl}/learn`}>
@@ -62,81 +55,20 @@ export default async function LearnCategoryPage({
         </div>
 
         <div className="flex items-start justify-between">
-          <div>
-            <h1 className="mb-2 flex items-center text-3xl font-bold">
-              <div className="relative mr-2 h-8 w-8">
-                {getIcon(
-                  categoryData.icon,
-                  null,
-                  categoryData.color?.split(",")[0],
-                )}
-              </div>
-              {categoryData.name}
-            </h1>
-            <p className="text-muted-foreground mb-4 max-w-2xl">
-              {categoryData.description}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2">
-            {categoryData.topics?.map((topic) => (
-              <Badge key={topic} variant="secondary" className="text-sm">
-                {topic}
-              </Badge>
-            ))}
-          </div>
+          <h1 className="mb-2 flex items-center text-3xl font-bold">
+            <div className="relative mr-2 h-8 w-8">
+              {getIcon(
+                categoryData.icon,
+                null,
+                categoryData.color?.split(",")[0],
+              )}
+            </div>
+            {categoryData.name}
+          </h1>
         </div>
       </div>
 
-      <div className="mb-8 grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <icons.BookOpen className="h-4 w-4" />
-              Wszystkie pytania
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {categoryData.questionCount}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <icons.Target className="h-4 w-4" />
-              Cel
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">75%</div>
-            <p className="text-muted-foreground text-xs">
-              Minimum do zaliczenia
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-sm font-medium">
-              <icons.Clock className="h-4 w-4" />
-              Szacowany czas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {formatTime(categoryData.questionCount * MINUTES_PER_QUESTION)}
-            </div>
-            <p className="text-muted-foreground text-xs">
-              ~{MINUTES_PER_QUESTION} min na pytanie
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="flex min-h-[400px] items-center justify-center">
+      <div className="my-auto flex shrink items-center justify-center">
         <CategoryLearningClient category={categoryData} />
       </div>
     </div>

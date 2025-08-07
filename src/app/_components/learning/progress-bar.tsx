@@ -92,52 +92,22 @@ export function LearningProgressBar({
           <CircleQuestionMarkIcon className="size-4" />
         </TooltipTrigger>
         <TooltipContent>
-          {attempt.currentAttempt == 1 ? (
-            <p>To jest twoje pierwsze podejście.</p>
-          ) : (
-            <p>
-              W poprzednich podejściach odpowiedziałeś poprawnie na{" "}
-              {attempt.previouslyAnswered}{" "}
-              {conjugate(
-                attempt.previouslyAnswered,
-                "pytanie",
-                "pytania",
-                "pytań",
-              )}{" "}
-              i nie zobaczysz ich ponownie.
-            </p>
-          )}
-          <p>
-            W tym podejściu odpowiedziałeś poprawnie na{" "}
-            {attempt.answeredCorrectly}{" "}
-            {conjugate(
-              attempt.answeredCorrectly,
-              "pytanie",
-              "pytania",
-              "pytań",
-            )}{" "}
-            i ich{" "}
-            {attempt.currentAttempt == 1
-              ? "nie zobaczysz ponownie"
-              : "również nie zobaczysz"}
-            .
-          </p>
-          <p>
-            W tym podejściu odpowiedziałeś źle na {attempt.answeredIncorrectly}{" "}
-            {conjugate(
-              attempt.answeredIncorrectly,
-              "pytanie",
-              "pytania",
-              "pytań",
-            )}{" "}
-            i te pojawią się w następnym podejściu.
-          </p>
-          <p>
-            W tym podejściu pozostało ci {attempt.notAnswered}{" "}
-            {conjugate(attempt.notAnswered, "pytanie", "pytania", "pytań")}.
-          </p>
+          {generateTooltipContent(attempt).map((content, index) => (
+            <p key={index}>{content}</p>
+          ))}
         </TooltipContent>
       </Tooltip>
     </div>
   );
+}
+
+function generateTooltipContent(attempt: LearningProgressBarProps["attempt"]) {
+  return [
+    attempt.currentAttempt == 1
+      ? "To jest twoje pierwsze podejście."
+      : `W poprzednich podejściach odpowiedziałeś poprawnie na ${attempt.previouslyAnswered} ${conjugate(attempt.previouslyAnswered, "pytanie", "pytania", "pytań")} i nie zobaczysz ich ponownie.`,
+    `W tym podejściu odpowiedziałeś poprawnie na ${attempt.answeredCorrectly} ${conjugate(attempt.answeredCorrectly, "pytanie", "pytania", "pytań")} i ich ${attempt.currentAttempt == 1 ? "nie zobaczysz ponownie" : "również nie zobaczysz"}.`,
+    `W tym podejściu odpowiedziałeś źle na ${attempt.answeredIncorrectly} ${conjugate(attempt.answeredIncorrectly, "pytanie", "pytania", "pytań")} i te pojawią się w następnym podejściu.`,
+    `W tym podejściu pozostało ci ${attempt.notAnswered} ${conjugate(attempt.notAnswered, "pytanie", "pytania", "pytań")}.`,
+  ];
 }
