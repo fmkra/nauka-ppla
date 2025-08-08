@@ -52,7 +52,7 @@ export default async function LearnPage({
     .orderBy(categories.id);
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <div className="mb-8">
         <h1 className="mb-4 text-3xl font-bold">
           Materiały do nauki {licenseData.name}
@@ -141,7 +141,7 @@ export default async function LearnPage({
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

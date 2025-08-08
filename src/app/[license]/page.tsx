@@ -104,7 +104,7 @@ export default async function HomePage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <>
       <div className="mb-12 text-center">
         <h1 className="mb-4 text-4xl font-bold">
           Witaj na Nauka {licenseData.name}
@@ -178,7 +178,7 @@ export default async function HomePage({
            <Button size="lg">Rozpocznij przygotowania</Button>
         </Link>
       </div>
-    </div>
+    </>
   );
 }
 

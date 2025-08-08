@@ -35,10 +35,10 @@ export default async function ExamsPage({
     .where(eq(categories.licenseId, license.id));
 
   return (
-    <div>
+    <>
       <ExamStart licenseId={license.id} />
       <ExamList licenseId={license.id} categories={categoriesData} />
-    </div>
+    </>
   );
 }
 
