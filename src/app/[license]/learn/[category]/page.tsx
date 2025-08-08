@@ -38,7 +38,7 @@ export default async function LearnCategoryPage({
   }
 
   return (
-    <div className="container mx-auto flex min-h-[calc(100vh_-_12rem)] flex-col px-4 py-4">
+    <div className="flex min-h-[calc(100vh_-_12rem)] flex-col">
       <div className="mb-8 shrink-0">
         <div className="mb-4 flex items-center gap-4">
           <Button variant="outline" size="sm" asChild>
