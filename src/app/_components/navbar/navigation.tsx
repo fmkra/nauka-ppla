@@ -90,7 +90,7 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
               <Menu className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="min-w-48">
+          <DropdownMenuContent className="mt-2 min-w-48">
             <DropdownMenuItem asChild>
               <Link href="/" className="flex items-center">
                 <GraduationCap className="h-6 w-6" />
