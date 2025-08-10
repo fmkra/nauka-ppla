@@ -62,7 +62,7 @@ export default function Exam({
   );
 
   // It is rendered only client side, so there will be no hydration error
-  const timeLeft = useTimeLeft(finishTime, Date.now());
+  const timeLeft = useTimeLeft(finishTime, Date.now(), () => sendAnswer(true));
 
   const utils = api.useUtils();
   const { mutate } = api.exam.answerQuestion.useMutation({
