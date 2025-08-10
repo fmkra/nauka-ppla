@@ -180,8 +180,8 @@ export default function Exam({
         </div>
       )}
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between">
-          <div>
+        <div className="flex items-center gap-4">
+          <div className="mr-auto">
             <h1 className="text-2xl font-bold">Egzamin</h1>
             <p className="text-muted-foreground">
               Pytanie {currentQuestion + 1} z {questions.length}
@@ -202,30 +202,26 @@ export default function Exam({
               </span>
             )}
           </div>
-        </div>
-
-        <Progress value={progress} />
-
-        <div className="mt-6 mb-3 flex justify-between">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentQuestion === 0}
-          >
-            Poprzednie pytanie
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleNext}
-            disabled={currentQuestion === questions.length - 1}
-          >
-            Następne pytanie
+          <Button onClick={() => setWarningMessage(true)}>
+            Zakończ egzamin
           </Button>
         </div>
+
+        <Progress value={progress} className="mt-2 mb-6" />
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl">{currentQ.question}</CardTitle>
+            <CardTitle className="flex text-xl">
+              <span className="w-full">{currentQ.question}</span>
+              <button
+                className="h-6 shrink-0 cursor-pointer px-2"
+                onClick={toggleFlag}
+              >
+                <FlagTriangleRight
+                  className={cn("size-5", hasFlag && "text-red-500")}
+                />
+              </button>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <RadioGroup
@@ -262,12 +258,20 @@ export default function Exam({
           </CardContent>
         </Card>
 
-        <div className="mt-6 flex justify-end">
-          <button className="cursor-pointer px-2" onClick={toggleFlag}>
-            <FlagTriangleRight className={hasFlag ? "text-red-500" : ""} />
-          </button>
-          <Button onClick={() => setWarningMessage(true)}>
-            Zakończ egzamin
+        <div className="mt-6 mb-3 flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentQuestion === 0}
+          >
+            Poprzednie pytanie
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleNext}
+            disabled={currentQuestion === questions.length - 1}
+          >
+            Następne pytanie
           </Button>
         </div>
 
