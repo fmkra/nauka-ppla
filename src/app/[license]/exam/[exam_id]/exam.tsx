@@ -293,7 +293,7 @@ export default function Exam({
                       ? "default"
                       : selectedAnswers[index] !== null
                         ? "outline"
-                        : "white"
+                        : "black-outline"
                   }
                   className="block"
                 >

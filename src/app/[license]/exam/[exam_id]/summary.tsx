@@ -15,18 +15,28 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "~/components/ui/accordion";
-import { CheckCircle, CircleQuestionMark, XCircle } from "lucide-react";
+import {
+  CheckCircle,
+  CircleQuestionMark,
+  FlagTriangleRight,
+  XCircle,
+} from "lucide-react";
 import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import CategoryStartButton from "../category-start-button";
+import { useExamFlagsStore } from "~/stores";
 
 export default function ExamSummary({
+  attemptId,
   questions,
   categoryId,
 }: {
+  attemptId: string;
   questions: QuestionWithAnswer[];
   categoryId: number;
 }) {
+  const { flags } = useExamFlagsStore().attempt(attemptId);
+
   const calculateScore = () => {
     let correct = 0;
     for (const question of questions) {
@@ -61,7 +71,12 @@ export default function ExamSummary({
             <AccordionItem key={question.id} value={question.id}>
               <AccordionTrigger iconSide="left">
                 <div className="flex w-full items-center justify-between">
-                  <span className="text-sm">Pytanie {index + 1}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm">Pytanie {index + 1}</span>
+                    {flags[question.questionInstanceId] && (
+                      <FlagTriangleRight className="size-4" />
+                    )}
+                  </div>
                   <div>
                     {question.answer === "A" ? (
                       <CheckCircle className="h-5 w-5 text-green-600" />

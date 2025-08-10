@@ -45,6 +45,10 @@ export default function ExamAttempt() {
     );
 
   return (
-    <ExamSummary questions={questionsParsed} categoryId={exam.categoryId} />
+    <ExamSummary
+      attemptId={exam.id}
+      questions={questionsParsed}
+      categoryId={exam.categoryId}
+    />
   );
 }
