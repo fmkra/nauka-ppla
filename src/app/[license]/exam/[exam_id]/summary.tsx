@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "~/components/ui/card";
 import { numberToAnswer, type QuestionWithAnswer } from "./exam";
-import { cn } from "~/lib/utils";
+import { cn, PASS_THRESHOLD } from "~/lib/utils";
 import {
   Accordion,
   AccordionContent,
@@ -25,17 +25,18 @@ import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import CategoryStartButton from "../category-start-button";
 import { useExamFlagsStore } from "~/stores";
+import type { FinishedExamAttempt } from "~/lib/types";
 
 export default function ExamSummary({
-  attemptId,
+  attempt,
   questions,
   categoryId,
 }: {
-  attemptId: string;
+  attempt: FinishedExamAttempt;
   questions: QuestionWithAnswer[];
   categoryId: number;
 }) {
-  const { flags } = useExamFlagsStore().attempt(attemptId);
+  const { flags } = useExamFlagsStore().attempt(attempt.id);
 
   const calculateScore = () => {
     let correct = 0;
@@ -49,12 +50,30 @@ export default function ExamSummary({
 
   const score = calculateScore();
   const percentage = (score / questions.length) * 100;
+  const isPassed = score >= questions.length * PASS_THRESHOLD;
+  const duration =
+    Math.min(attempt.finishedAt.getTime(), attempt.deadlineTime.getTime()) -
+    attempt.startedAt.getTime();
+  const durationSeconds = Math.floor(duration / 1000);
+  const minutes = Math.floor(durationSeconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const seconds = (durationSeconds % 60).toString().padStart(2, "0");
 
   return (
     <Card className="mx-auto max-w-2xl">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl">Wynik</CardTitle>
-        <CardDescription>To twoje wyniki egzaminu</CardDescription>
+        <CardTitle
+          className={cn(
+            "text-2xl",
+            isPassed ? "text-green-500" : "text-red-500",
+          )}
+        >
+          {isPassed ? "Zaliczony" : "Niezaliczony"}
+        </CardTitle>
+        <CardDescription>
+          Czas trwania: {minutes}:{seconds}
+        </CardDescription>
       </CardHeader>
       <CardContent className="text-center">
         <div className="mb-6">

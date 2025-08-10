@@ -39,3 +39,5 @@ export function formatTime(minutes: number) {
 }
 
 export const MINUTES_PER_QUESTION = 1.5;
+
+export const PASS_THRESHOLD = 0.75;

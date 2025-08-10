@@ -14,8 +14,7 @@ import {
 } from "~/app/_components/category-filter";
 import { useState } from "react";
 import { useTimer } from "~/lib/use-timer";
-
-const PASS_THRESHOLD = 0.75;
+import { PASS_THRESHOLD } from "~/lib/utils";
 
 function getStatus(
   finishedAt: Date | null,

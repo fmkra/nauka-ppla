@@ -6,6 +6,7 @@ import { api } from "~/trpc/react";
 import Exam from "./exam";
 import ExamSummary from "./summary";
 import { Spinner } from "~/components/ui/spinner";
+import type { FinishedExamAttempt } from "~/lib/types";
 
 export default function ExamAttempt() {
   const { exam_id } = useParams<{ exam_id: string }>();
@@ -24,31 +25,31 @@ export default function ExamAttempt() {
     );
   }
 
-  const [exam, questions] = data;
+  const [attempt, questions] = data;
 
   const questionsParsed = questions.map((examQuestion) => ({
     ...shuffleAnswers(
       examQuestion.questionInstance.question,
-      getRandomNumber(`${exam.id}_${examQuestion.questionInstanceId}`),
+      getRandomNumber(`${attempt.id}_${examQuestion.questionInstanceId}`),
     ),
     answer: examQuestion.answer,
     questionInstanceId: examQuestion.questionInstance.id,
   }));
 
-  if (exam.finishedAt === null)
+  if (attempt.finishedAt === null)
     return (
       <Exam
-        examAttemptId={exam.id}
+        examAttemptId={attempt.id}
         questions={questionsParsed}
-        finishTime={exam.deadlineTime.getTime()}
+        finishTime={attempt.deadlineTime.getTime()}
       />
     );
 
   return (
     <ExamSummary
-      attemptId={exam.id}
+      attempt={attempt as FinishedExamAttempt}
       questions={questionsParsed}
-      categoryId={exam.categoryId}
+      categoryId={attempt.categoryId}
     />
   );
 }
