@@ -13,6 +13,7 @@ import {
   type Category,
 } from "~/app/_components/category-filter";
 import { useState } from "react";
+import { useTimer } from "~/lib/use-timer";
 
 const PASS_THRESHOLD = 0.75;
 
@@ -54,6 +55,25 @@ function formatDate(date: Date) {
   }).format(new Date(date));
 }
 
+function calculateDuration(
+  startedAt: Date,
+  finishedAt: Date | null,
+  maxTime: number,
+  currentTime: Date,
+) {
+  const duration =
+    (finishedAt === null ? currentTime.getTime() : finishedAt.getTime()) -
+    startedAt.getTime();
+
+  const totalSeconds = Math.min(Math.floor(duration / 1000), maxTime);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const secondsStr = seconds.toString().padStart(2, "0");
+  const minutesStr = minutes.toString().padStart(2, "0");
+
+  return `${minutesStr}:${secondsStr}`;
+}
+
 const pageSizeOptions = [
   { label: "10", value: "10" },
   { label: "20", value: "20" },
@@ -87,6 +107,9 @@ export default function ExamList({
       categoryIds: selectedCategories,
     },
   );
+
+  // It is rendered only client side, so there will be no hydration error
+  const currentTime = useTimer(new Date());
 
   const isLoading = isExamCountLoading || isExamsLoading;
   const isEmpty = totalCount === null || exams === null || exams?.length === 0;
@@ -128,6 +151,9 @@ export default function ExamList({
                     <th className="px-4 py-3 text-left font-medium">Status</th>
                     <th className="px-4 py-3 text-left font-medium">
                       Postęp / Wynik
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Czas trwania
                     </th>
                     <th className="w-24 px-4 py-3 text-left font-medium"></th>
                   </tr>
@@ -186,6 +212,14 @@ export default function ExamList({
                               {progressPercentage}%
                             </span>
                           </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {calculateDuration(
+                            exam.startedAt,
+                            exam.finishedAt,
+                            exam.examTime,
+                            currentTime,
+                          )}
                         </td>
                         <td className="px-4 py-3">
                           <Button variant="outline" className="w-full">

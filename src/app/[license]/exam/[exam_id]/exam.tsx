@@ -7,7 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import type { QuestionParsed } from "~/lib/shuffle";
-import { useTimer } from "~/lib/use-timer";
+import { useTimeLeft } from "~/lib/use-time-left";
 import { api } from "~/trpc/react";
 import { Clock } from "lucide-react";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -61,7 +61,8 @@ export default function Exam({
     getInitialAnswers(questions),
   );
 
-  const timeLeft = useTimer(finishTime);
+  // It is rendered only client side, so there will be no hydration error
+  const timeLeft = useTimeLeft(finishTime, Date.now());
 
   const utils = api.useUtils();
   const { mutate } = api.exam.answerQuestion.useMutation({
