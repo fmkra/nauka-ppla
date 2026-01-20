@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { clearLicense, selectLicense } from "~/app/actions";
 
 const navigation = [
   { name: "Start", href: "", icon: Home },
@@ -22,28 +23,25 @@ const navigation = [
 
 export default function Navigation({ options }: { options: SelectOption[] }) {
   const pathname = usePathname().split("/");
-  const router = useRouter();
   const license = pathname[1] === "" ? undefined : pathname[1];
   const page = pathname[2] ?? "";
-
-  const handleLicenseChange = (value: string) => {
-    if (value === license) return;
-    router.push(`/${value}`);
-  };
 
   if (!license)
     return (
       <div className="flex items-center gap-2">
-        <Link href="/" className="flex items-center">
+        <button
+          className="flex cursor-pointer items-center"
+          onClick={clearLicense}
+        >
           <GraduationCap className="h-6 w-6" />
-        </Link>
+        </button>
 
         <Select
           className="w-42"
           placeholder="Wybierz licencję"
           options={options}
           value={license}
-          onValueChange={handleLicenseChange}
+          onValueChange={selectLicense}
         />
       </div>
     );
@@ -51,16 +49,19 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
   return (
     <div className="flex items-center gap-2">
       <div className="hidden items-center gap-1 sm:flex">
-        <Link href="/" className="flex items-center">
+        <button
+          className="flex cursor-pointer items-center"
+          onClick={clearLicense}
+        >
           <GraduationCap className="h-6 w-6" />
-        </Link>
+        </button>
 
         <Select
           className="mr-4 ml-1 w-24"
           placeholder="Wybierz licencję"
           options={options}
           value={license}
-          onValueChange={handleLicenseChange}
+          onValueChange={selectLicense}
         />
 
         {navigation.map((item) => {
@@ -104,7 +105,7 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
                 placeholder="Wybierz licencję"
                 options={options}
                 value={license}
-                onValueChange={handleLicenseChange}
+                onValueChange={selectLicense}
               />
             </DropdownMenuItem>
 

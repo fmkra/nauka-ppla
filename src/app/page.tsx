@@ -7,8 +7,8 @@ import {
 } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { db } from "~/server/db";
-import Link from "next/link";
 import { getIcon } from "~/lib/get-icon";
+import { selectLicense } from "./actions";
 
 export default async function LearnPage() {
   const licenses = await db.query.licenses.findMany({
@@ -50,9 +50,9 @@ export default async function LearnPage() {
                   {license.description}
                 </CardDescription>
 
-                <Button className="mt-auto w-full" asChild>
-                  <Link href={`/${license.url}`}>Wybierz licencję</Link>
-                </Button>
+                <form action={selectLicense.bind(null, license.url)}>
+                  <Button className="mt-auto w-full">Wybierz licencję</Button>
+                </form>
               </CardContent>
             </Card>
           );
