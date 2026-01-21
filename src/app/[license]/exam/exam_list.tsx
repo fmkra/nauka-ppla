@@ -15,6 +15,7 @@ import {
 import { useState } from "react";
 import { useTimer } from "~/lib/use-timer";
 import { PASS_THRESHOLD } from "~/lib/utils";
+import { useSession } from "next-auth/react";
 
 function getStatus(
   finishedAt: Date | null,
@@ -86,10 +87,12 @@ export default function ExamList({
   licenseId: number;
   categories: Category[];
 }) {
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
 
   const { data: totalCount, isLoading: isExamCountLoading } =
-    api.exam.getExamCount.useQuery({ licenseId });
+    api.exam.getExamCount.useQuery({ licenseId }, { enabled: isLoggedIn });
 
   const pagination = usePagination(
     pageSizeOptions,
@@ -105,6 +108,7 @@ export default function ExamList({
       offset: pagination.offset,
       categoryIds: selectedCategories,
     },
+    { enabled: isLoggedIn },
   );
 
   // It is rendered only client side, so there will be no hydration error
@@ -112,6 +116,8 @@ export default function ExamList({
 
   const isLoading = isExamCountLoading || isExamsLoading;
   const isEmpty = totalCount === null || exams === null || exams?.length === 0;
+
+  if (!isLoggedIn) return null;
 
   return (
     <Card className="mt-8">

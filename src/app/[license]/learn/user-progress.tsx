@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { Button, variants as buttonVariants } from "~/components/ui/button";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/trpc/react";
@@ -23,13 +24,21 @@ export default function CardUserProgress({
   licenseUrl: string;
   category: Category;
 }) {
-  const { data, isLoading } = api.learning.getLicenseProgress.useQuery({
-    licenseId,
-  });
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
+
+  const { data, isLoading } = api.learning.getLicenseProgress.useQuery(
+    {
+      licenseId,
+    },
+    {
+      enabled: isLoggedIn,
+    },
+  );
 
   const categoryProgress = data?.[category.id];
 
-  if (isLoading) {
+  if (isLoading && isLoggedIn) {
     return (
       <Skeleton
         className={cn("mt-auto h-9 w-full", buttonVariants.variant.default)}
@@ -39,17 +48,23 @@ export default function CardUserProgress({
 
   return (
     <>
-      {categoryProgress ? (
+      {categoryProgress && isLoggedIn ? (
         <p className="text-muted-foreground mb-2 text-sm">
           Ukończono {categoryProgress.done} z {categoryProgress.total}{" "}
           {conjugate(categoryProgress.done, "pytania", "pytań", "pytań")}
         </p>
       ) : null}
-      <Button className="mt-auto w-full" asChild>
-        <Link href={`/${licenseUrl}/learn/${category.url}`}>
+      {isLoggedIn ? (
+        <Button className="mt-auto w-full" asChild>
+          <Link href={`/${licenseUrl}/learn/${category.url}`}>
+            {categoryProgress ? "Kontynuuj naukę" : "Rozpocznij naukę"}
+          </Link>
+        </Button>
+      ) : (
+        <Button className="mt-auto w-full" disabled>
           {categoryProgress ? "Kontynuuj naukę" : "Rozpocznij naukę"}
-        </Link>
-      </Button>
+        </Button>
+      )}
     </>
   );
 }

@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import ExamList from "./exam_list";
 import ExamStart from "./exam_start";
 import { categories } from "~/server/db/category";
+import LoginWarning from "~/app/_components/login-warning";
 
 export default async function ExamsPage({
   params,
@@ -36,6 +37,7 @@ export default async function ExamsPage({
 
   return (
     <>
+      <LoginWarning header="aby uzyskać dostęp do egzaminu" description="Musisz być zalogowany, aby rozpocząć egzamin i śledzić swój postęp." />
       <ExamStart licenseId={license.id} />
       <ExamList licenseId={license.id} categories={categoriesData} />
     </>

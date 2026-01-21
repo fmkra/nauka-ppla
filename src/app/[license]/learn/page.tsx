@@ -16,6 +16,7 @@ import { conjugate, formatTime, MINUTES_PER_QUESTION } from "~/lib/utils";
 import { notFound } from "next/navigation";
 import { getIcon } from "~/lib/get-icon";
 import CardUserProgress from "./user-progress";
+import LoginWarning from "../../_components/login-warning";
 
 export default async function LearnPage({
   params,
@@ -62,6 +63,8 @@ export default async function LearnPage({
           na licencję pilota prywatnego samolotu (PPL-A).
         </p>
       </div>
+
+      <LoginWarning header="aby uzyskać dostęp do nauki" description="Musisz być zalogowany, aby rozpocząć naukę i śledzić swój postęp." />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {cardsWithCounts.map((card) => (
