@@ -12,7 +12,7 @@ export default function LoginWarning({ header, description }: { header: string, 
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
 
-  if (isLoggedIn) {
+  if (session === null || isLoggedIn) {
     return null;
   }
 
