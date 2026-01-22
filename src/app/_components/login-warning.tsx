@@ -11,9 +11,8 @@ import LoginLink from "./login-link";
 export default function LoginWarning({ header, description }: { header: string, description: string }) {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
-  console.log('session', session);
 
-  if (!session || isLoggedIn) {
+  if (session === undefined || isLoggedIn) {
     return null;
   }
 
