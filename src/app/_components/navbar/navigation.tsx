@@ -93,10 +93,10 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
           </DropdownMenuTrigger>
           <DropdownMenuContent className="mt-2 min-w-48">
             <DropdownMenuItem asChild>
-              <Link href="/" className="flex items-center">
+              <button className="flex items-center w-full" onClick={clearLicense}>
                 <GraduationCap className="h-6 w-6" />
                 <span>Strona główna</span>
-              </Link>
+              </button>
             </DropdownMenuItem>
 
             <DropdownMenuItem asChild>
