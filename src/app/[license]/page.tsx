@@ -124,7 +124,7 @@ export default async function HomePage({
               odpowiedzi i postępy w nauce.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <Link href={`/${license}/learn`}>
               <Button className="w-full">
                 Rozpocznij naukę <ArrowRight className="ml-2 h-4 w-4" />
@@ -141,7 +141,7 @@ export default async function HomePage({
               wyszukuj po treści.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <Link href={`/${license}/questions`}>
               <Button className="w-full bg-transparent" variant="outline">
                 Zobacz pytania
@@ -159,7 +159,7 @@ export default async function HomePage({
               naszego symulatora egzaminu.
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             <Link href={`/${license}/exam`}>
               <Button className="w-full" variant="secondary">
                 Podejdź do egzaminu

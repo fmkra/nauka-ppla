@@ -95,7 +95,7 @@ export default function Navigation({ options }: { options: SelectOption[] }) {
             <DropdownMenuItem asChild>
               <button className="flex items-center w-full" onClick={clearLicense}>
                 <GraduationCap className="h-6 w-6" />
-                <span>Strona główna</span>
+                <span>Wybór licencji</span>
               </button>
             </DropdownMenuItem>
 

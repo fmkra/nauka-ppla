@@ -16,7 +16,7 @@ export default async function LearnPage() {
   });
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8">
       <div className="mb-8">
         <h1 className="mb-4 text-3xl font-bold">Wybierz swój typ licencji</h1>
         <p className="text-muted-foreground">
