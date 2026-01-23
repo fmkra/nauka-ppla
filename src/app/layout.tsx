@@ -9,6 +9,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "~/app/_components/navbar/navbar";
 import { SessionProvider } from "next-auth/react";
 import { Notifications } from "./_components/notifications";
+import { HelpImproving } from "./_components/help-improving";
 
 // export const metadata: Metadata = {
 //   title: "Create T3 App",
@@ -32,6 +33,7 @@ export default function RootLayout({
             <Navbar />
             <main className="container mx-auto p-4">{children}</main>
             <Notifications />
+            <HelpImproving />
           </TRPCReactProvider>
         </SessionProvider>
       </body>
