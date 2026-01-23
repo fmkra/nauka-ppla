@@ -37,7 +37,10 @@ export default async function ExamsPage({
 
   return (
     <>
-      <LoginWarning header="aby uzyskać dostęp do egzaminu" description="Musisz być zalogowany, aby rozpocząć egzamin i śledzić swój postęp." />
+      <LoginWarning
+        header="aby uzyskać dostęp do egzaminu"
+        description="Musisz być zalogowany, aby rozpocząć egzamin i śledzić swój postęp."
+      />
       <ExamStart licenseId={license.id} />
       <ExamList licenseId={license.id} categories={categoriesData} />
     </>

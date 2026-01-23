@@ -30,7 +30,7 @@ export default function RootLayout({
         <SessionProvider>
           <TRPCReactProvider>
             <Navbar />
-            <main className="container mx-auto p-4 flex-1">{children}</main>
+            <main className="container mx-auto flex-1 p-4">{children}</main>
             <Notifications />
           </TRPCReactProvider>
         </SessionProvider>

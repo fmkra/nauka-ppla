@@ -56,15 +56,20 @@ export default async function LearnPage({
   return (
     <>
       <div className="mb-8">
-        <h1 className="mb-4 text-3xl font-bold">
-          Tryb nauki
-        </h1>
+        <h1 className="mb-4 text-3xl font-bold">Tryb nauki</h1>
         <p className="text-muted-foreground">
-          Przejdź przez wszystkie dostępne pytania egzaminacyjne. Pytania, na które odpowiesz poprawnie, nie pojawią się w danej sesji nauki ponownie. Po przejściu przez wszystkie pytania, możesz rozpocząć kolejne podejście, w którym pojawią się jedynie pytania, na które odpowiedziano błędnie.
+          Przejdź przez wszystkie dostępne pytania egzaminacyjne. Pytania, na
+          które odpowiesz poprawnie, nie pojawią się w danej sesji nauki
+          ponownie. Po przejściu przez wszystkie pytania, możesz rozpocząć
+          kolejne podejście, w którym pojawią się jedynie pytania, na które
+          odpowiedziano błędnie.
         </p>
       </div>
 
-      <LoginWarning header="aby uzyskać dostęp do nauki" description="Musisz być zalogowany, aby rozpocząć naukę i śledzić swój postęp." />
+      <LoginWarning
+        header="aby uzyskać dostęp do nauki"
+        description="Musisz być zalogowany, aby rozpocząć naukę i śledzić swój postęp."
+      />
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {cardsWithCounts.map((card) => (

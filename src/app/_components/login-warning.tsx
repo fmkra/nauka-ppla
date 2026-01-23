@@ -1,14 +1,17 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import {
-  Card,
-  CardContent,
-} from "~/components/ui/card";
+import { Card, CardContent } from "~/components/ui/card";
 import { Info } from "lucide-react";
 import LoginLink from "./login-link";
 
-export default function LoginWarning({ header, description }: { header: string, description: string }) {
+export default function LoginWarning({
+  header,
+  description,
+}: {
+  header: string;
+  description: string;
+}) {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
 

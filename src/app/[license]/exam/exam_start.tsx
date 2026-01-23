@@ -42,7 +42,7 @@ export default async function ExamStart({ licenseId }: { licenseId: number }) {
                   {categorydescription}
                 </CardDescription> */}
 
-              <div className="text-muted-foreground mb-4 flex items-center gap-4 text-sm mt-auto">
+              <div className="text-muted-foreground mt-auto mb-4 flex items-center gap-4 text-sm">
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   {category.examTime / 60} min
