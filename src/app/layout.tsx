@@ -9,7 +9,6 @@ import { TRPCReactProvider } from "~/trpc/react";
 import Navbar from "~/app/_components/navbar/navbar";
 import { SessionProvider } from "next-auth/react";
 import { Notifications } from "./_components/notifications";
-import { HelpImproving } from "./_components/help-improving";
 
 // export const metadata: Metadata = {
 //   title: "Create T3 App",
@@ -27,13 +26,12 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
-      <body>
+      <body className="flex min-h-screen flex-col">
         <SessionProvider>
           <TRPCReactProvider>
             <Navbar />
-            <main className="container mx-auto p-4">{children}</main>
+            <main className="container mx-auto p-4 flex-1">{children}</main>
             <Notifications />
-            <HelpImproving />
           </TRPCReactProvider>
         </SessionProvider>
       </body>

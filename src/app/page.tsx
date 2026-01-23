@@ -20,8 +20,7 @@ export default async function LearnPage() {
       <div className="mb-8">
         <h1 className="mb-4 text-3xl font-bold">Wybierz swój typ licencji</h1>
         <p className="text-muted-foreground">
-          Kompleksowe materiały do przygotowania się do egzaminu teoretycznego
-          na licencję pilota prywatnego samolotu.
+          Kompleksowe materiały przygotowujące do egzaminu teoretycznego na licencję pilota prywatnego samolotu.
         </p>
       </div>
 

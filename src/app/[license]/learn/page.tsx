@@ -118,31 +118,6 @@ export default async function LearnPage({
           </Card>
         ))}
       </div>
-
-      <div className="bg-muted/50 mt-12 rounded-lg p-6">
-        <h2 className="mb-4 text-xl font-semibold">
-          Informacje o egzaminie PPL(A)
-        </h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div>
-            <h3 className="mb-2 font-medium">Wymagania egzaminacyjne:</h3>
-            <ul className="text-muted-foreground space-y-1 text-sm">
-              <li>• Minimum 75% poprawnych odpowiedzi w każdym przedmiocie</li>
-              <li>• Czas trwania egzaminu i ilość pytań zależy od przedmiotu (szczegóły w sekcji <Link className="underline" href="exam">Egzamin</Link>)</li>
-              <li>• Wymagane zaliczenie wszystkich 9 przedmiotów</li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="mb-2 font-medium">Struktura egzaminu:</h3>
-            <ul className="text-muted-foreground space-y-1 text-sm">
-              <li>• Każdy przedmiot to osobny moduł</li>
-              <li>• Pytania zamknięte z jedną poprawną odpowiedzią</li>
-              <li>• Możliwość powrotu do pytań</li>
-              <li>• Wynik dostępny natychmiast</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
