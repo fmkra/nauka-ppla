@@ -170,12 +170,26 @@ export default async function HomePage({
         </Card>
       </div>
       <div className="text-center">
-        <h2 className="mb-4 text-2xl font-semibold">Gotów, aby zacząć?</h2>     
-        <p className="text-muted-foreground mb-6">
-          Wybierz swój tryb nauki i rozpocznij podróż do zdobycia licencji.
-        </p>
+        <h2 className="mb-4 text-2xl font-semibold">Informacje o egzaminie</h2>
+        <div className="text-justify mb-6 flex flex-col gap-4 text-muted-foreground">
+          <p>
+            Po ukończeniu kursu teoretycznego, kandydat musi zdać wszystkie 9 przedmiotów w ciągu 18 miesięcy. Egzamin podzielony jest na sesje trwające kilka dni. Ilość sesji, w których można wziąć udział nie jest ogarniczona, natomiast do każdego przedmiotu można podejść w sumie maksymalnie 4 razy i maksymalnie raz w ciągu jednej sesji.
+          </p>
+          <p>
+            Każde pytanie jest zamknięte i ma 4 możliwe odpowiedzi, z których tylko jedna jest poprawna. Końcowy wynik to stosunek ilości poprawnych odpowiedzi do ilości wszystkich pytań (nie ma ujemnych punktów za błędne odpowiedzi). Aby zdać, kandydat musi uzyskać 75% lub więcej poprawnych odpowiedzi. Pytania są przydzielane losowo, a ich ilość jest stała i zależna od przedmiotu. Ograniczenie czasowe dotyczy długości jednego egzaminu (jednego przedmiotu) i jest zależne od przedmiotu. Dokładną ilość pytań i czas trwania egzaminu można znaleźć w sekcji <Link className="underline" href={`${license}/exam`}>Egzamin</Link>. Do pytań można powracać i modyfikować odpowiedzi, a egzamin kończy się dopiero po kliknięciu &quot;Zakończ egzamin&quot; lub po upływie czasu.
+          </p>
+          <p>
+            Dane na dzień 23.01.2026
+            <br />
+            Żródła:
+            <br />
+            <Link className="underline" href="https://ulc.gov.pl/personel-lotniczy/komisja-egzaminacyjna/plan-sesji-egzaminacyjnej" target="_blanc">https://ulc.gov.pl/personel-lotniczy/komisja-egzaminacyjna/plan-sesji-egzaminacyjnej</Link>
+            <br />
+            <Link className="underline" href="https://ulc.gov.pl/_download/lke/czas_liczba_pytan_kbp.pdf" target="_blanc">https://ulc.gov.pl/_download/lke/czas_liczba_pytan_kbp.pdf</Link>
+          </p>
+        </div>
         <Link href={`/${license}/learn`}>
-           <Button size="lg">Rozpocznij przygotowania</Button>
+           <Button size="lg">Rozpocznij naukę</Button>
         </Link>
       </div>
     </>

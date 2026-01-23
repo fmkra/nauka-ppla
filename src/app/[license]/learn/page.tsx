@@ -17,6 +17,7 @@ import { notFound } from "next/navigation";
 import { getIcon } from "~/lib/get-icon";
 import CardUserProgress from "./user-progress";
 import LoginWarning from "../../_components/login-warning";
+import Link from "next/link";
 
 export default async function LearnPage({
   params,
@@ -56,11 +57,10 @@ export default async function LearnPage({
     <>
       <div className="mb-8">
         <h1 className="mb-4 text-3xl font-bold">
-          Materiały do nauki {licenseData.name}
+          Tryb nauki
         </h1>
         <p className="text-muted-foreground">
-          Kompleksowe materiały do przygotowania się do egzaminu teoretycznego
-          na licencję pilota prywatnego samolotu (PPL-A).
+          Przejdź przez wszystkie dostępne pytania egzaminacyjne. Pytania, na które odpowiesz poprawnie, nie pojawią się w danej sesji nauki ponownie. Po przejściu przez wszystkie pytania, możesz rozpocząć kolejne podejście, w którym pojawią się jedynie pytania, na które odpowiedziano błędnie.
         </p>
       </div>
 
@@ -128,8 +128,7 @@ export default async function LearnPage({
             <h3 className="mb-2 font-medium">Wymagania egzaminacyjne:</h3>
             <ul className="text-muted-foreground space-y-1 text-sm">
               <li>• Minimum 75% poprawnych odpowiedzi w każdym przedmiocie</li>
-              <li>• Egzamin trwa 3 godziny</li>
-              <li>• łącznie 425 pytań testowych</li>
+              <li>• Czas trwania egzaminu i ilość pytań zależy od przedmiotu (szczegóły w sekcji <Link className="underline" href="exam">Egzamin</Link>)</li>
               <li>• Wymagane zaliczenie wszystkich 9 przedmiotów</li>
             </ul>
           </div>
@@ -137,7 +136,7 @@ export default async function LearnPage({
             <h3 className="mb-2 font-medium">Struktura egzaminu:</h3>
             <ul className="text-muted-foreground space-y-1 text-sm">
               <li>• Każdy przedmiot to osobny moduł</li>
-              <li>• Pytania wielokrotnego wyboru</li>
+              <li>• Pytania zamknięte z jedną poprawną odpowiedzią</li>
               <li>• Możliwość powrotu do pytań</li>
               <li>• Wynik dostępny natychmiast</li>
             </ul>
